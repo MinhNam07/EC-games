@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dựng Sân Khấu EC</title>
 <meta name="description" content="Game dựng sân khấu: làm trưởng ban tổ chức trong 90 giây cùng Event Club of BUV.">
+<meta name="theme-color" content="#dff0ec">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22%23e23b2e%22/%3E%3Ctext x=%2232%22 y=%2242%22 font-size=%2228%22 font-family=%22Arial%22 font-weight=%22900%22 text-anchor=%22middle%22 fill=%22%23ffcf3a%22%3EEC%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,108 +13,160 @@
 <style>
 /* VOICE: playful but "pro" — you are the event planner on deadline
    IDEA: a production floor plan sheet: client brief card, venue grid, gear catalogue, budget meter
-   PICTURE: the top-down venue grid (stage zone + audience zone) that fills up with gear sprites
-   COLOUR and TYPE: deep teal plan board, peach paper cards, sunflower accent; Baloo 2 + Be Vietnam Pro
-   LAYOUT: brief + meters on top, grid large on the left, catalogue right; stacks grid → catalogue on phones */
-:root{color-scheme:light dark;--bg:light-dark(#dff0ec,#0b2422);--ink:light-dark(#10201f,#eef7f4);--teal:#0f6b66;--teal2:#0a4f4b;--peach:light-dark(#ffe6d6,#2c3b39);--card:light-dark(#fff,#16312f);--yel:#ffd23f;--red:#e8483b;--line:light-dark(#10201f,#9fd6cf)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+   LAYOUT (laptop/tablet ≥768px): one screen, no page scroll — header, HUD bar (brief · meters · clock),
+   then grid + catalogue side by side; the catalogue scrolls inside its own column.
+   THEME: locked light (booth is a fixed scene). Shared tokens with the other two pages. */
+:root{color-scheme:light;
+  --ink:#10201f;--paper:#fffaf0;--card:#fff;--sun:#ffd23f;--tomato:#e8483b;--ok:#2f9e5b;
+  --bg:#dff0ec;--teal:#0f6b66;--teal2:#0a4f4b;--peach:#ffe6d6;
+  --r-md:14px;--bw:3px;--lift:0 4px 0 var(--ink);
+  --f-d:"Baloo 2",sans-serif;--f-b:"Be Vietnam Pro",system-ui,sans-serif}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Be Vietnam Pro",system-ui,sans-serif;overflow-x:clip}
-h1,h2,h3{font-family:"Baloo 2",sans-serif;line-height:1.05;margin:0}
-.wrap{max-width:1240px;margin:0 auto;padding:clamp(14px,3vw,32px) max(4vw,12px);position:relative}
-header{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-header h1{font-size:clamp(32px,5.5vw,50px);font-weight:800;color:var(--teal)}
-:root[data-theme=dark] header h1{color:var(--yel)}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]) header h1{color:var(--yel)}}
-header p{margin:0;font-weight:600}
-.top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
-@media(max-width:760px){.top{grid-template-columns:minmax(0,1fr)}}
-.brief{background:var(--peach);border:3px solid var(--line);border-radius:18px;padding:14px 18px}
-.brief h2{font-size:clamp(24px,4vw,32px)}
-.brief .meta{display:flex;gap:14px;flex-wrap:wrap;font-weight:700;margin:4px 0 8px}
-.reqs{display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0;list-style:none}
-.reqs li{border:2px solid var(--line);border-radius:999px;padding:3px 10px;font-size:14px;font-weight:600;white-space:nowrap;background:var(--card)}
-.reqs li.ok{background:#3fb36b;color:#fff;border-color:#1d6b3c}
-.meters{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:14px 18px;display:grid;gap:10px}
-.mrow{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;font-weight:700;font-size:15px}
-.bar{height:16px;border-radius:9px;background:light-dark(#e4ecea,#0b2422);border:2px solid var(--line);overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--teal);transition:width .2s}
-.bar i.over{background:var(--red)}
+[hidden]{display:none!important}
+::selection{background:var(--sun);color:var(--ink)}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-b);overflow-x:clip}
+h1,h2,h3{font-family:var(--f-d);line-height:1.05;margin:0}
+
+.app{height:100dvh;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:12px;padding:14px clamp(14px,2vw,26px) 18px;max-width:1440px;margin:0 auto}
+.st-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.st-head h1{font-size:clamp(28px,3vw,36px);font-weight:800;color:var(--teal)}
+.st-head .who{font-weight:700;font-size:14px;opacity:.75}
+.st-head .sp{flex:1}
+
+.hudbar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:12px;align-items:stretch}
+.brief{background:var(--peach);border:var(--bw) solid var(--ink);border-radius:18px;padding:10px 16px}
+.brief h2{font-size:clamp(22px,2.4vw,28px)}
+.brief .meta{font-weight:700;font-size:14px;margin:2px 0 6px;display:flex;gap:4px 12px;flex-wrap:wrap}
+.reqs{display:flex;flex-wrap:wrap;gap:5px;padding:0;margin:0;list-style:none}
+.reqs li{border:2px solid var(--ink);border-radius:999px;padding:1px 9px;font-size:13px;font-weight:700;white-space:nowrap;background:var(--card);transition:background-color .2s,color .2s}
+.reqs li.ok{background:var(--ok);color:#fff;border-color:#1d6b3c}
+.meters{background:var(--card);border:var(--bw) solid var(--ink);border-radius:18px;padding:10px 16px;display:grid;gap:8px;align-content:center}
+.mrow{display:grid;grid-template-columns:88px minmax(0,1fr) 74px;gap:10px;align-items:center;font-weight:700;font-size:14px}
+.mrow b{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:14px;border-radius:9px;background:#e4ecea;border:2px solid var(--ink);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--teal);transition:width .2s cubic-bezier(.2,.8,.2,1)}
+.bar i.over{background:var(--tomato)}
 .bar i.hype{background:linear-gradient(90deg,#ffd23f,#ff7a3a)}
-.mrow b{font-variant-numeric:tabular-nums;white-space:nowrap}
-.main{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}
-@media(max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
-.plan{background:var(--teal);border:3px solid var(--line);border-radius:20px;padding:12px;position:relative}
-.grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;touch-action:none;user-select:none;-webkit-user-select:none}
+.clock{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:8px;min-width:170px}
+.timer{background:var(--ink);color:#fff;border-radius:16px;display:grid;place-items:center;align-content:center;font:800 clamp(40px,4.4vw,56px)/1 var(--f-d);font-variant-numeric:tabular-nums;padding:6px 0;transition:background-color .2s}
+.timer small{font:700 12px/1.2 var(--f-b);opacity:.7}
+.timer.low{background:var(--tomato)}
+.timer.low.tick{animation:tick .3s ease-out}
+@keyframes tick{0%{transform:scale(1.06)}100%{transform:scale(1)}}
+.clock .btn{width:100%;padding:4px 12px}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) clamp(260px,26vw,340px);gap:14px;min-height:0}
+.plan{background:var(--teal);border:var(--bw) solid var(--ink);border-radius:20px;padding:10px 12px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;min-height:0}
+.zl{display:flex;justify-content:space-between;gap:10px;color:#fff;font-weight:700;font-size:13px;padding:0 2px}
+.zl span:first-child{color:var(--sun)}
+.gridwrap{container-type:size;min-height:0;display:grid;place-items:center}
+.grid{width:min(100cqw,calc(100cqh * 8 / 6.45));display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;touch-action:none;user-select:none;-webkit-user-select:none}
 .cell{aspect-ratio:1;border-radius:8px;background:#ffffff14;border:2px dashed #ffffff40;display:grid;place-items:center;cursor:pointer;position:relative;padding:3px}
 .cell.st{background:#ffd23f22;border-color:#ffd23f70}
-.cell.full{border-style:solid;background:#ffffffe6;border-color:#10201f}
+.cell.full{border-style:solid;background:#ffffffe6;border-color:var(--ink)}
 .cell.full.st{background:#fff6d8}
 .cell svg{width:100%;height:100%}
+.cell.pop{animation:plop .28s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes plop{0%{transform:scale(.6)}100%{transform:scale(1)}}
 .cell.bad{animation:bad .3s}
-@keyframes bad{30%{background:#e8483b}}
-.cell:focus-visible{outline:3px solid var(--yel);outline-offset:1px}
-.zl{display:flex;justify-content:space-between;color:#fff;font-weight:700;font-size:14px;margin:2px 4px 8px}
-.zl span:first-child{color:var(--yel)}
-.divider{grid-column:1/-1;height:0;border-top:3px solid #ffd23f;margin:3px 0;position:relative}
-.cat{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:12px}
-.cat h3{font-size:24px;margin:0 4px 8px}
-.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-@media(max-width:900px){.items{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
-.it{display:grid;grid-template-columns:40px minmax(0,1fr);gap:8px;align-items:center;text-align:left;padding:6px 8px;min-height:52px;border:2px solid #10201f33;border-radius:12px;background:var(--card);color:var(--ink);font:600 14px/1.2 "Be Vietnam Pro",system-ui,sans-serif;cursor:pointer}
-.it svg{width:40px;height:40px;background:#fff;border-radius:8px}
-.it small{display:block;font-weight:700;color:var(--teal);font-size:13px;margin-top:2px}
-:root[data-theme=dark] .it small{color:var(--yel)}
-.it.sel{border-color:var(--teal);background:#ffd23f;color:#10201f;box-shadow:0 0 0 3px var(--teal)}
-.it.sel small{color:#10201f}
-.it:focus-visible{outline:3px solid #2a7cff}
-.hint{font-size:13px;opacity:.85;margin:8px 4px 0}
-.btn{font:800 19px "Baloo 2",sans-serif;min-height:48px;padding:6px 20px;border:3px solid #10201f;border-radius:14px;background:var(--yel);color:#10201f;cursor:pointer;box-shadow:0 4px 0 #10201f}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #10201f}
-.btn.pri{background:var(--red);color:#fff}
-.btn.ghost{background:var(--card);color:var(--ink)}
+@keyframes bad{30%{background:var(--tomato)}}
+.cell:focus-visible{outline:3px solid var(--sun);outline-offset:1px}
+@media(hover:hover){.cell:not(.full):hover{background:#ffffff2e}}
+.divider{grid-column:1/-1;display:flex;align-items:center;gap:10px;color:var(--sun);font:800 13px/1 var(--f-d);margin:2px 0;pointer-events:none}
+.divider::before,.divider::after{content:"";flex:1;border-top:3px dashed var(--sun)}
+.tools{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.tools p{margin:0;color:#fff;font-size:13px;font-weight:600;opacity:.9}
+.tools div{display:flex;gap:8px}
+
+.cat{container-type:inline-size;background:var(--card);border:var(--bw) solid var(--ink);border-radius:20px;padding:10px 10px 8px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0}
+.cat h3{font-size:22px;margin:0 4px 6px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-rows:max-content;gap:6px;overflow-y:auto;align-content:start;padding:2px 4px 8px 2px;scrollbar-width:thin;scrollbar-color:var(--teal) transparent;overscroll-behavior:contain}
+.it{display:grid;grid-template-columns:36px minmax(0,1fr);gap:7px;align-items:center;text-align:left;padding:5px 7px;min-height:52px;border:2px solid #10201f33;border-radius:12px;background:var(--card);color:var(--ink);font:600 13px/1.2 var(--f-b);cursor:pointer;transition:transform .1s}
+.it svg{width:36px;height:36px;background:#f4f1ec;border-radius:8px}
+.it small{display:block;font-weight:700;color:var(--teal);font-size:12px;margin-top:1px}
+.it.sel{border-color:var(--ink);background:var(--sun);box-shadow:0 3px 0 var(--ink)}
+.it.sel small{color:var(--ink)}
+.it:active{transform:translateY(2px)}
+.it:focus-visible{outline:3px solid #2a7cff;outline-offset:1px}
+.hint{font-size:12px;opacity:.8;margin:6px 4px 0}
+
+.btn{font:800 18px var(--f-d);min-height:46px;padding:4px 18px;border:var(--bw) solid var(--ink);border-radius:var(--r-md);background:var(--sun);color:var(--ink);cursor:pointer;box-shadow:var(--lift);display:inline-grid;place-items:center;text-decoration:none;white-space:nowrap;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn.pri{background:var(--tomato);color:#fff}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.sm{font-size:16px;min-height:42px;padding:2px 14px}
 .btn:focus-visible,input:focus-visible{outline:3px solid #2a7cff;outline-offset:2px}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
-.timer{font:800 30px/1 "Baloo 2",sans-serif;color:#fff;background:#10201f;border-radius:12px;padding:6px 14px;font-variant-numeric:tabular-nums;margin-left:auto}
-.timer.low{background:var(--red)}
+
+/* phones: stack and scroll (booth runs on laptop/tablet, this is a fallback) */
+@media(max-width:767px){
+  .app{height:auto;min-height:100dvh}
+  .hudbar{grid-template-columns:minmax(0,1fr)}
+  .clock{width:auto;grid-template-columns:1fr 1fr;grid-template-rows:auto;position:sticky;top:8px;z-index:5}
+  .work{grid-template-columns:minmax(0,1fr)}
+  .gridwrap{container-type:inline-size}
+  .grid{width:100%}
+  .items{max-height:46vh}
+}
+/* short laptop screens: tighten the HUD so the grid keeps its size */
+@media(min-width:768px) and (max-height:700px){.brief .meta{display:none}.mrow{font-size:13px}.app{gap:8px;padding-top:10px}}
+/* tablet portrait: brief takes a full row, meters + clock share the next */
+@media(min-width:768px) and (max-width:1023px) and (orientation:portrait){.hudbar{grid-template-columns:minmax(0,1fr) auto}.brief{grid-column:1/-1}}
+
 .ov{position:fixed;inset:0;background:#081a19d9;display:grid;place-items:center;padding:16px;z-index:20}
-.ov[hidden]{display:none}
-.panel{background:var(--card);color:var(--ink);border:3px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,28px);width:min(560px,100%);max-height:94vh;overflow:auto}
-.panel h2{font-size:clamp(28px,5vw,40px);margin-bottom:6px}
+.panel{background:var(--card);color:var(--ink);border:var(--bw) solid var(--ink);border-radius:22px;padding:clamp(16px,3vw,28px);width:min(560px,100%);max-height:94dvh;overflow:auto}
+.panel h2{font-size:clamp(28px,4vw,40px);margin-bottom:6px}
 label{font-weight:700;display:block;margin:12px 0 6px}
-input[type=text]{width:100%;font:16px "Be Vietnam Pro",system-ui,sans-serif;padding:12px 14px;border:3px solid #10201f;border-radius:12px;background:#fff;color:#10201f}
-.stars{font:800 54px/1 "Baloo 2",sans-serif;color:var(--yel);-webkit-text-stroke:2px #10201f;letter-spacing:4px}
-.stars .off{color:#10201f22}
-.big{font:800 clamp(56px,12vw,80px)/1 "Baloo 2",sans-serif;color:var(--teal)}
-table{width:100%;border-collapse:collapse;font-size:15px;margin:10px 0}
-td{padding:6px 4px;border-bottom:1px dashed #10201f33}
+input[type=text]{width:100%;font:16px var(--f-b);padding:12px 14px;border:var(--bw) solid var(--ink);border-radius:12px;background:#fff;color:var(--ink)}
+.briefs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:6px}
+.bopt{text-align:left;padding:10px 14px;border:var(--bw) solid var(--ink);border-radius:14px;background:var(--peach);color:var(--ink);cursor:pointer;font:600 14px/1.35 var(--f-b);box-shadow:0 3px 0 var(--ink);transition:transform .08s}
+.bopt:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.bopt b{font:800 20px var(--f-d);display:block}
+.bopt small{display:block;font-weight:700;margin-top:4px;color:var(--teal)}
+.bopt.rnd{background:var(--sun)}
+.bopt:focus-visible{outline:3px solid #2a7cff;outline-offset:2px}
+#ovStart .panel{width:min(760px,100%)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+
+#ovEnd .panel{width:min(880px,100%);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;text-align:left}
+@media(max-width:720px){#ovEnd .panel{grid-template-columns:minmax(0,1fr)}}
+.res{text-align:center}
+.stars{font:800 58px/1 var(--f-d);color:var(--sun);-webkit-text-stroke:2px var(--ink);letter-spacing:4px}
+.stars span{display:inline-block}
+.stars .off{color:#10201f1f}
+.stars.go span:not(.off){animation:star .5s cubic-bezier(.2,.9,.3,1.4) both}
+.stars.go span:nth-child(2){animation-delay:.15s}.stars.go span:nth-child(3){animation-delay:.3s}
+@keyframes star{0%{transform:scale(0) rotate(-40deg);opacity:0}100%{transform:none;opacity:1}}
+.big{font:800 clamp(56px,9vw,84px)/1 var(--f-d);color:var(--teal);font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0;text-align:left}
+td{padding:5px 4px;border-bottom:1px dashed #10201f33}
 td:last-child{text-align:right;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.lbbox h3{font-size:26px;margin-bottom:6px}
+.rank{font:800 18px var(--f-d);margin:0 0 6px;color:var(--teal)}
 ol{margin:0;padding:0;list-style:none}
-ol li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;padding:6px 0;border-bottom:2px dashed #10201f22;align-items:center}
-ol li em{font-style:normal;font:800 16px "Baloo 2",sans-serif;width:26px;height:26px;border-radius:50%;background:var(--yel);color:#10201f;display:grid;place-items:center}
+ol li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;padding:5px 0;border-bottom:2px dashed #10201f22;align-items:center}
+ol li em{font:800 16px var(--f-d);font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--sun);border:2px solid var(--ink);display:grid;place-items:center}
 ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 ol li span small{opacity:.7;margin-left:6px}
 ol li b{font-variant-numeric:tabular-nums}
-ol li.me{background:#ffd23f55;border-radius:8px}
-.lbcard{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:12px 16px;margin-top:14px}
-.lbcard h3{font-size:24px;margin-bottom:6px}
-.linkbtn{background:none;border:0;color:inherit;text-decoration:underline;font:13px "Be Vietnam Pro",system-ui,sans-serif;cursor:pointer;min-height:44px;padding:0}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#10201f;color:#fff;padding:10px 18px;border-radius:12px;font-weight:600;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;max-width:92vw;text-align:center}
+ol li.me{background:#ffd23f66;border-radius:8px}
+.linkbtn{background:none;border:0;color:inherit;text-decoration:underline;text-underline-offset:3px;font:13px var(--f-b);cursor:pointer;min-height:44px;padding:0}
+.note{font-size:13px;opacity:.85}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;font-weight:600;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;max-width:92vw;text-align:center}
 .toast.on{opacity:1}
-.briefs{display:grid;gap:8px;margin-top:10px}
-.bopt{text-align:left;padding:10px 14px;border:3px solid #10201f;border-radius:14px;background:var(--peach);color:var(--ink);cursor:pointer;font:600 15px "Be Vietnam Pro",system-ui,sans-serif}
-.bopt b{font:800 20px "Baloo 2",sans-serif;display:block}
-.bopt:focus-visible{outline:3px solid #2a7cff}
-@media(prefers-reduced-motion:reduce){.cell.bad{animation:none}.bar i{transition:none}}
+@media(prefers-reduced-motion:reduce){.cell.pop,.cell.bad,.timer.low.tick,.stars.go span{animation:none}.bar i,.reqs li{transition:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div><h1>Dựng Sân Khấu</h1><p>Event Club of BUV — 90 giây để bạn làm trưởng ban tổ chức</p></div>
+<div class="app">
+  <header class="st-head">
+    <h1>Dựng Sân Khấu</h1><span class="who" id="who">Event Club of BUV</span><span class="sp"></span>
+    <button class="btn ghost sm" id="soundBtn" aria-pressed="true">Âm thanh: bật</button>
+    <button class="btn ghost sm" id="quitBtn">Bỏ cuộc</button>
+    <a class="btn ghost sm" href="/">← Đổi game</a>
   </header>
 
-  <div class="top">
+  <div class="hudbar">
     <section class="brief" aria-live="polite">
       <h2 id="bName">Đêm nhạc Acoustic</h2>
       <div class="meta"><span id="bBudget"></span><span id="bVibe"></span></div>
@@ -122,61 +175,62 @@ ol li.me{background:#ffd23f55;border-radius:8px}
     <section class="meters">
       <div class="mrow"><span>Ngân sách</span><div class="bar"><i id="mB"></i></div><b id="tB">0 / 0tr</b></div>
       <div class="mrow"><span>Yêu cầu</span><div class="bar"><i id="mR"></i></div><b id="tR">0%</b></div>
-      <div class="mrow"><span>Độ hype</span><div class="bar"><i class="hype" id="mH"></i></div><b id="tH">0</b></div>
+      <div class="mrow"><span>Độ hype</span><div class="bar"><i class="hype" id="mH"></i></div><b id="tH">0%</b></div>
     </section>
+    <div class="clock">
+      <div class="timer" id="timerBox"><span id="timer">90</span><small>giây</small></div>
+      <button class="btn pri" id="doneBtn">Chốt phương án</button>
+    </div>
   </div>
 
-  <div class="main">
+  <div class="work">
     <section class="plan">
-      <div class="zl"><span>Khu sân khấu</span><span>Phía trên = sân khấu, phía dưới = khán giả</span></div>
-      <div class="grid" id="grid"></div>
-      <div class="zl" style="margin:8px 4px 0"><span style="color:#fff">Khu khán giả</span><span>Cửa vào</span></div>
-      <div class="actions">
-        <button class="btn ghost" id="undoBtn">Hoàn tác</button>
-        <button class="btn ghost" id="clearBtn">Xoá hết</button>
-        <button class="btn pri" id="doneBtn">Chốt phương án</button>
-        <button class="btn ghost" id="quitBtn">Bỏ cuộc</button>
-        <div class="timer" id="timer">90</div>
-      </div>
+      <div class="zl"><span>Khu sân khấu</span><span>Cửa vào ở phía dưới</span></div>
+      <div class="gridwrap"><div class="grid" id="grid"></div></div>
+      <div class="tools"><p>Chạm hoặc kéo để đặt · chạm đồ đã đặt để gỡ</p><div><button class="btn ghost sm" id="undoBtn">Hoàn tác</button><button class="btn ghost sm" id="clearBtn">Xoá hết</button></div></div>
     </section>
     <section class="cat">
       <h3>Kho thiết bị</h3>
       <div class="items" id="items"></div>
-      <p class="hint">Chọn thiết bị, rồi chạm hoặc kéo trên sơ đồ để đặt. Chạm vào đồ đã đặt để gỡ. Mẹo: đặt loa sát sân khấu được cộng điểm.</p>
+      <p class="hint">Mẹo: đặt loa sát sân khấu được cộng điểm.</p>
     </section>
   </div>
-
-  <section class="lbcard">
-    <h3>Bảng vàng Event Planner</h3>
-    <ol id="lb"></ol>
-    <button class="linkbtn" id="lbClear">Xoá bảng xếp hạng</button> · <a class="linkbtn" href="/" style="display:inline-block">Về trang chủ</a>
-  </section>
 </div>
 
 <div class="ov" id="ovStart">
   <div class="panel">
     <h2>Khách hàng vừa gửi brief!</h2>
-    <p>Bạn là trưởng ban tổ chức của Event Club of BUV. Chọn một sự kiện, rồi trong 90 giây dựng sân khấu đủ yêu cầu, đúng không khí và không vượt ngân sách.</p>
+    <p style="margin:0">Bạn là trưởng ban tổ chức của Event Club of BUV. Chọn một sự kiện, rồi trong 90 giây dựng sân khấu đủ yêu cầu, đúng không khí và không vượt ngân sách.</p>
     <label for="nm">Tên của bạn</label>
     <input type="text" id="nm" maxlength="20" placeholder="Ví dụ: Gia Huy" autocomplete="off">
     <label>Chọn sự kiện</label>
     <div class="briefs" id="briefs"></div>
+    <div class="actions"><a class="btn ghost sm" href="/">← Đổi game</a></div>
   </div>
 </div>
 
 <div class="ov" id="ovEnd" hidden>
-  <div class="panel" style="text-align:center">
-    <p id="eName" style="font-weight:700;margin:0"></p>
-    <div class="stars" id="eStars"></div>
-    <div class="big" id="eScore">0</div>
-    <h2 id="eTitle" style="font-size:30px"></h2>
-    <table id="eTable"></table>
-    <p id="eTip" style="font-weight:600"></p>
-    <p style="font-size:14px;opacity:.85">Ở Event Club, mỗi sự kiện thật đều bắt đầu như thế này. Muốn thử làm thật? Hỏi các anh chị ở booth nhé!</p>
-    <div class="actions" style="justify-content:center">
-      <button class="btn pri" id="againBtn">Chơi lại</button>
-      <button class="btn" id="nextBtn">Người tiếp theo</button>
+  <div class="panel">
+    <div class="res">
+      <p id="eName" style="font-weight:700;margin:0"></p>
+      <div class="stars" id="eStars"></div>
+      <div class="big" id="eScore">0</div>
+      <h2 id="eTitle" style="font-size:30px"></h2>
+      <table id="eTable"></table>
+      <p id="eTip" style="font-weight:600;margin:0 0 6px"></p>
+      <p class="note" style="margin:0">Ở Event Club, mỗi sự kiện thật đều bắt đầu như thế này. Muốn thử làm thật? Hỏi các anh chị ở booth nhé!</p>
+      <div class="actions" style="justify-content:center">
+        <button class="btn pri" id="againBtn">Chơi lại</button>
+        <button class="btn" id="nextBtn">Người tiếp theo</button>
+        <a class="btn ghost" href="/">← Đổi game</a>
+      </div>
     </div>
+    <section class="lbbox">
+      <h3>Bảng vàng Event Planner</h3>
+      <p class="rank" id="eRank"></p>
+      <ol id="lb"></ol>
+      <button class="linkbtn" id="lbClear">Xoá bảng xếp hạng</button>
+    </section>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -241,15 +295,18 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(lb))}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const byId=Object.fromEntries(ITEMS.map(i=>[i.id,i]));
 const fmt=n=>(Math.round(n*10)/10).toString().replace('.',',');
+let sound=true,ac=null;
+function beep(f,d=.09,type='square',v=.1){if(!sound)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(Math.max(40,f/2.5),t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d)}catch(e){}}
+$('#soundBtn').addEventListener('click',e=>{sound=!sound;e.currentTarget.textContent='Âm thanh: '+(sound?'bật':'tắt');e.currentTarget.setAttribute('aria-pressed',sound)});
 
 $('#items').innerHTML=ITEMS.map(i=>`<button class="it" data-id="${i.id}">${icon(i.id)}<span>${i.n}<small>${fmt(i.c)}tr · ${i.z==='s'?'sân khấu':i.z==='a'?'khán giả':'mọi khu'}</small></span></button>`).join('');
-$('#grid').innerHTML=grid.map((_,k)=>`<div class="cell${Math.floor(k/COLS)<STAGE_ROWS?' st':''}" data-k="${k}" tabindex="0" role="button" aria-label="Ô ${k+1}"></div>`).join('');
+$('#grid').innerHTML=grid.map((_,k)=>(k===STAGE_ROWS*COLS?'<div class="divider" aria-hidden="true">Mép sân khấu</div>':'')+`<div class="cell${Math.floor(k/COLS)<STAGE_ROWS?' st':''}" data-k="${k}" tabindex="0" role="button" aria-label="Ô ${k+1}"></div>`).join('');
 const cells=[...document.querySelectorAll('.cell')];
-$('#briefs').innerHTML=BRIEFS.map((b,i)=>`<button class="bopt" data-b="${i}"><b>${b.n}</b>${b.d} Ngân sách ${b.b}tr.</button>`).join('')+`<button class="bopt" data-b="r"><b>Bốc thăm ngẫu nhiên</b>Để số phận chọn giúp bạn.</button>`;
+$('#briefs').innerHTML=BRIEFS.map((b,i)=>`<button class="bopt" data-b="${i}"><b>${b.n}</b>${b.d}<small>Ngân sách ${b.b}tr · ${V[b.vibe]}</small></button>`).join('')+`<button class="bopt rnd" data-b="r"><b>Bốc thăm ngẫu nhiên</b>Để số phận chọn giúp bạn.</button>`;
 
 function selItem(id){sel=id;document.querySelectorAll('.it').forEach(b=>b.classList.toggle('sel',b.dataset.id===id))}
 selItem(sel);
-$('#items').addEventListener('click',e=>{const b=e.target.closest('.it');if(b)selItem(b.dataset.id)});
+$('#items').addEventListener('click',e=>{const b=e.target.closest('.it');if(b){selItem(b.dataset.id);beep(880,.04,'triangle',.06)}});
 
 let tt=0;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1600)}
 
@@ -266,25 +323,28 @@ function evaluate(){
   const total=Math.max(0,Math.min(100,Math.round(req+vibe+bud+place)));
   return{rows,req,vibe,bud,place,total,cost,over,vibeVal:v[brief.vibe],sn};
 }
+let doneReqs=0;
 function render(){
   grid.forEach((id,k)=>{const el=cells[k];el.classList.toggle('full',!!id);el.innerHTML=id?icon(id):'';el.setAttribute('aria-label',id?byId[id].n:'Ô trống '+(k+1))});
   const e=evaluate();
   $('#reqs').innerHTML=e.rows.map(r=>`<li class="${r.ok?'ok':''}">${TAG[r.k]} ${r.have}/${r.need}</li>`).join('');
+  const nOk=e.rows.filter(r=>r.ok).length;if(state==='play'&&nOk>doneReqs)setTimeout(()=>beep(1320,.12,'triangle',.08),60);doneReqs=nOk;
   const mb=$('#mB');mb.style.width=Math.min(100,e.cost/brief.b*100)+'%';mb.classList.toggle('over',e.over>0);
   $('#tB').textContent=`${fmt(e.cost)} / ${brief.b}tr`;
   const rq=Math.round(e.req/55*100);$('#mR').style.width=rq+'%';$('#tR').textContent=rq+'%';
   const hv=Math.round(Math.min(1,e.vibeVal/brief.vt)*100);$('#mH').style.width=hv+'%';$('#tH').textContent=hv+'%';
 }
+function popCell(k){const el=cells[k];el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
 function place(k){
   if(state!=='play')return;
   const it=byId[sel],r=Math.floor(k/COLS),inStage=r<STAGE_ROWS;
   if(grid[k]===sel)return;
   if(it.z==='s'&&!inStage){bad(k,`${it.n} phải đặt ở khu sân khấu`);return}
   if(it.z==='a'&&inStage){bad(k,`${it.n} phải đặt ở khu khán giả`);return}
-  hist.push(grid.slice());grid[k]=sel;render();
+  hist.push(grid.slice());grid[k]=sel;render();popCell(k);beep(620,.06,'triangle',.09);
 }
-function bad(k,m){const el=cells[k];el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad');toast(m)}
-function removeAt(k){if(state!=='play'||!grid[k])return;hist.push(grid.slice());grid[k]=null;render()}
+function bad(k,m){const el=cells[k];el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad');toast(m);beep(150,.14,'sawtooth',.08)}
+function removeAt(k){if(state!=='play'||!grid[k])return;hist.push(grid.slice());grid[k]=null;render();beep(300,.05,'triangle',.06)}
 
 let down=false,mode='place';
 const cellAt=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.closest('.cell')};
@@ -292,10 +352,12 @@ $('#grid').addEventListener('pointerdown',e=>{const c=e.target.closest('.cell');
 $('#grid').addEventListener('pointermove',e=>{if(!down)return;const c=cellAt(e);if(!c)return;const k=+c.dataset.k;if(mode==='place'&&!grid[k])place(k);else if(mode==='erase'&&grid[k]===sel)removeAt(k)});
 window.addEventListener('pointerup',()=>down=false);
 $('#grid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('cell')){e.preventDefault();const k=+e.target.dataset.k;grid[k]?removeAt(k):place(k)}});
-$('#undoBtn').addEventListener('click',()=>{if(state==='play'&&hist.length){grid=hist.pop();render()}});
-$('#clearBtn').addEventListener('click',()=>{if(state==='play'&&grid.some(Boolean)){hist.push(grid.slice());grid.fill(null);render()}});
+$('#undoBtn').addEventListener('click',()=>{if(state==='play'&&hist.length){grid=hist.pop();render();beep(400,.05,'triangle',.06)}});
+$('#clearBtn').addEventListener('click',()=>{if(state==='play'&&grid.some(Boolean)){hist.push(grid.slice());grid.fill(null);render();beep(220,.12,'triangle',.08)}});
 $('#doneBtn').addEventListener('click',()=>{if(state==='play')finish()});
-$('#quitBtn').addEventListener('click',()=>{if(state!=='play')return;state='idle';clearInterval(tick);grid.fill(null);hist=[];render();$('#timer').textContent=TIME;$('#timer').classList.remove('low');$('#ovStart').hidden=false});
+const tm=$('#timer'),tbox=$('#timerBox');
+function resetTimer(){tm.textContent=TIME;tbox.classList.remove('low','tick')}
+$('#quitBtn').addEventListener('click',()=>{if(state!=='play')return;state='idle';clearInterval(tick);grid.fill(null);hist=[];render();resetTimer();$('#ovStart').hidden=false});
 
 function renderLb(hl){$('#lb').innerHTML=lb.length?lb.map((r,i)=>`<li class="${i===hl?'me':''}"><em>${i+1}</em><span>${esc(r.n)}<small>${esc(r.b)}</small></span><b>${r.s}</b></li>`).join(''):'<li style="display:block;opacity:.7">Chưa có ai. Hãy là Event Planner đầu tiên!</li>'}
 renderLb(-1);
@@ -303,11 +365,12 @@ renderLb(-1);
 function start(i){
   player=$('#nm').value.trim()||'Planner bí ẩn';
   brief=i==='r'?BRIEFS[Math.random()*BRIEFS.length|0]:BRIEFS[+i];
-  grid.fill(null);hist=[];state='play';tLeft=TIME;
+  grid.fill(null);hist=[];doneReqs=0;state='play';tLeft=TIME;
+  $('#who').textContent=`${player} đang làm trưởng ban`;
   $('#bName').textContent=brief.n;$('#bBudget').textContent=`Ngân sách: ${brief.b}tr`;$('#bVibe').textContent=`Không khí: ${V[brief.vibe]}`;
   $('#ovStart').hidden=true;$('#ovEnd').hidden=true;render();
-  const tm=$('#timer');tm.textContent=TIME;tm.classList.remove('low');clearInterval(tick);
-  tick=setInterval(()=>{tLeft--;tm.textContent=tLeft;tm.classList.toggle('low',tLeft<=15);if(tLeft<=0)finish()},1000);
+  resetTimer();clearInterval(tick);beep(660,.1,'triangle',.08);
+  tick=setInterval(()=>{tLeft--;tm.textContent=tLeft;const low=tLeft<=15;tbox.classList.toggle('low',low);if(low){tbox.classList.remove('tick');void tbox.offsetWidth;tbox.classList.add('tick')}if(tLeft<=10&&tLeft>0)beep(tLeft<=3?990:740,.05,'square',.05);if(tLeft<=0)finish()},1000);
 }
 $('#briefs').addEventListener('click',e=>{const b=e.target.closest('.bopt');if(b)start(b.dataset.b)});
 
@@ -315,7 +378,7 @@ function finish(){
   state='idle';clearInterval(tick);
   const e=evaluate();let stars=e.total>=85?3:e.total>=65?2:e.total>=40?1:0;if(e.over>0)stars=Math.min(stars,1);
   $('#eName').textContent=`${player} · ${brief.n}`;
-  $('#eStars').innerHTML=[0,1,2].map(i=>`<span class="${i<stars?'':'off'}">★</span>`).join('');
+  const st=$('#eStars');st.classList.remove('go');st.innerHTML=[0,1,2].map(i=>`<span class="${i<stars?'':'off'}">★</span>`).join('');void st.offsetWidth;st.classList.add('go');
   $('#eScore').textContent=e.total;
   $('#eTitle').textContent=['Cần thêm kinh nghiệm','Thực tập sinh sự kiện','Event Planner xịn','Trưởng ban tổ chức'][stars];
   const r1=x=>Math.round(x);
@@ -323,10 +386,12 @@ function finish(){
   const miss=e.rows.filter(r=>!r.ok).map(r=>TAG[r.k]);
   $('#eTip').textContent=e.over>0?`Vượt ngân sách ${fmt(e.over)}tr: khách hàng sẽ không vui đâu!`:miss.length?`Còn thiếu: ${miss.join(', ')}.`:e.vibe<15?`Đủ đồ rồi, nhưng chưa đúng chất "${V[brief.vibe]}".`:'Phương án gần như hoàn hảo!';
   const rec={n:player,b:brief.n,s:e.total};lb.push(rec);lb.sort((a,b)=>b.s-a.s);const pos=lb.indexOf(rec);lb=lb.slice(0,10);save();renderLb(pos<10?pos:-1);
+  $('#eRank').textContent=pos===0?'Kỷ lục mới của booth!':pos<10?`Bạn đứng hạng ${pos+1}`:'Chưa vào top 10, thử lại nhé!';
+  [523,659,784,1047].slice(0,stars+1).forEach((f,i)=>setTimeout(()=>beep(f,.16,'triangle',.09),i*140));
   $('#ovEnd').hidden=false;
 }
 $('#againBtn').addEventListener('click',()=>{$('#ovEnd').hidden=true;start(BRIEFS.indexOf(brief))});
-$('#nextBtn').addEventListener('click',()=>{$('#nm').value='';$('#ovEnd').hidden=true;$('#ovStart').hidden=false;$('#nm').focus()});
+$('#nextBtn').addEventListener('click',()=>{$('#nm').value='';$('#ovEnd').hidden=true;resetTimer();grid.fill(null);hist=[];render();$('#who').textContent='Event Club of BUV';$('#ovStart').hidden=false;$('#nm').focus()});
 let armed=0;$('#lbClear').addEventListener('click',e=>{if(armed){lb=[];save();renderLb(-1);armed=0;e.target.textContent='Xoá bảng xếp hạng'}else{armed=1;e.target.textContent='Bấm lần nữa để xoá hẳn';setTimeout(()=>{armed=0;e.target.textContent='Xoá bảng xếp hạng'},3000)}});
 render();
 }

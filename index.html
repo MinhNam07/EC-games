@@ -5,40 +5,125 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Booth Event Club of BUV</title>
 <meta name="description" content="Hai mini game tại booth giới thiệu Event Club of BUV: Đập Chuột và Dựng Sân Khấu.">
+<meta name="theme-color" content="#fff4d6">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22%23e23b2e%22/%3E%3Ctext x=%2232%22 y=%2242%22 font-size=%2228%22 font-family=%22Arial%22 font-weight=%22900%22 text-anchor=%22middle%22 fill=%22%23ffcf3a%22%3EEC%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Be+Vietnam+Pro:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light dark;--bg:light-dark(#fff4d6,#1b1210);--ink:light-dark(#22140f,#fff1e0)}
+/* Booth home: two big game "cabinets" that read from across the room.
+   THEME: locked light; shared tokens with both games. */
+:root{color-scheme:light;--bg:#fff4d6;--ink:#22140f;--paper:#fffaf0;--sun:#ffcf3a;--tomato:#e23b2e;--mint:#5ccdc3;--teal:#0f6b66;--grass:#63b94b;--grass2:#3f8d34;
+  --f-d:"Baloo 2",sans-serif;--f-b:"Be Vietnam Pro",system-ui,sans-serif}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:17px/1.5 "Be Vietnam Pro",system-ui,sans-serif;display:grid;place-items:center;padding:24px 16px}
-main{width:min(980px,100%)}
-h1{font:800 clamp(36px,7vw,60px)/1.05 "Baloo 2",sans-serif;margin:0 0 6px}
-p.lead{margin:0 0 24px;font-weight:600}
-.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-a.g{display:block;text-decoration:none;color:#22140f;border:4px solid #22140f;border-radius:26px;padding:24px;min-height:230px;box-shadow:0 8px 0 #22140f;transition:transform .1s;position:relative;overflow:hidden}
-a.g:hover{transform:translateY(-3px)}a.g:active{transform:translateY(5px);box-shadow:0 3px 0 #22140f}
-a.g:focus-visible{outline:4px solid #2a7cff;outline-offset:4px}
-a.g h2{font:800 clamp(32px,5vw,42px)/1 "Baloo 2",sans-serif;margin:0 0 8px}
-a.g p{margin:0;max-width:30ch}
-a.g span{display:inline-block;margin-top:18px;font:800 20px "Baloo 2";background:#22140f;color:#fff;padding:6px 18px;border-radius:12px}
-.m{background:#ffcf3a}.s{background:#5ccdc3}
-.m::after,.s::after{content:"";position:absolute;right:-30px;bottom:-30px;width:150px;height:150px;border-radius:50%;border:4px solid #22140f;opacity:.25}
-.m::after{background:#e23b2e}.s::after{background:#0f6b66}
-footer{margin-top:28px;font-size:14px;opacity:.75}
-@media(prefers-reduced-motion:reduce){a.g{transition:none}}
+::selection{background:var(--sun);color:var(--ink)}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 var(--f-b)}
+h1,h2{font-family:var(--f-d);line-height:1.05;margin:0}
+.home{min-height:100dvh;max-width:1440px;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(14px,2.4vh,22px);padding:clamp(18px,4vh,36px) clamp(16px,3.4vw,48px) clamp(14px,3vh,26px)}
+header{display:flex;justify-content:space-between;align-items:end;gap:20px}
+header h1{font-size:clamp(38px,5.6vw,68px);font-weight:800}
+header p{margin:4px 0 0;font-weight:600;font-size:clamp(16px,1.6vw,20px);max-width:60ch}
+.logo{width:clamp(56px,7vw,88px);height:auto;flex:none}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.2vw,28px);min-height:0}
+.g{display:grid;grid-template-rows:auto auto minmax(120px,1fr) auto;gap:6px;text-decoration:none;color:var(--ink);border:4px solid var(--ink);border-radius:30px;box-shadow:0 9px 0 var(--ink);padding:clamp(18px,2.4vw,28px);overflow:hidden;position:relative;transition:transform .12s cubic-bezier(.2,.8,.2,1),box-shadow .12s}
+.g.m{background:var(--sun)}.g.s{background:var(--mint)}
+@media(hover:hover){.g:hover{transform:translateY(-4px);box-shadow:0 13px 0 var(--ink)}}
+.g:active{transform:translateY(6px);box-shadow:0 3px 0 var(--ink)}
+.g:focus-visible{outline:4px solid #2a7cff;outline-offset:5px}
+.g h2{font-size:clamp(38px,4.6vw,60px);font-weight:800}
+.g p{margin:0;font-size:clamp(16px,1.5vw,19px);max-width:32ch}
+.art{display:grid;place-items:center;min-height:0;padding:8px 0;container-type:size}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.rec{background:var(--ink);color:#fff;border-radius:14px;padding:7px 14px;font-size:13px;line-height:1.25}
+.rec b{display:block;font:800 21px/1.15 var(--f-d);color:var(--sun);font-variant-numeric:tabular-nums;max-width:22ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cta{font:800 clamp(20px,2vw,25px) var(--f-d);min-height:56px;padding:6px 28px;border:3px solid var(--ink);border-radius:16px;box-shadow:0 5px 0 var(--ink);display:inline-grid;place-items:center;background:var(--tomato);color:#fff}
+.g.s .cta{background:var(--sun);color:var(--ink)}
+.tag{position:absolute;right:22px;top:22px;font:800 16px var(--f-d);background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:2px 12px;transform:rotate(6deg)}
+.g.s .tag{transform:rotate(-5deg)}
+.idle .tag{animation:wiggle 1.6s ease-in-out infinite}
+.idle .g.s .tag{animation-delay:.8s}
+@keyframes wiggle{0%,60%,100%{transform:rotate(6deg) scale(1)}70%{transform:rotate(-4deg) scale(1.12)}80%{transform:rotate(10deg) scale(1.08)}90%{transform:rotate(4deg)}}
+.idle .mole.peek{animation:peek 2.4s ease-in-out infinite}
+@keyframes peek{0%,100%{transform:translateY(6%)}45%,55%{transform:translateY(80%)}}
+footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px;font-weight:600;opacity:.75}
+
+/* mini lawn with moles (same parts as the game) */
+.lawn{width:min(80%,380px,calc(190cqh - 16px));aspect-ratio:2/1;background:radial-gradient(circle at 30% 20%,#7fd067,var(--grass) 60%,var(--grass2));border:3px solid var(--ink);border-radius:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px 14px 0;align-items:end;transform:rotate(-3deg)}
+.hole{position:relative;aspect-ratio:1}
+.hole::before{content:"";position:absolute;left:8%;right:8%;bottom:8%;height:26%;background:radial-gradient(ellipse at 50% 40%,#1c0f08,#4a2b17 70%);border-radius:50%}
+.pit{position:absolute;left:10%;right:10%;top:0;bottom:21%;overflow:hidden;border-radius:0 0 50% 50%/0 0 22% 22%}
+.mole{position:absolute;left:8%;right:8%;bottom:0;height:92%;transform:translateY(130%)}
+.mole.up{transform:translateY(6%)}
+.body{position:absolute;inset:0;background:linear-gradient(#9a6236,#6e4122);border:3px solid var(--ink);border-bottom:0;border-radius:50% 50% 18% 18%/56% 56% 18% 18%}
+.ear{position:absolute;top:4%;width:22%;aspect-ratio:1;background:#9a6236;border:3px solid var(--ink);border-radius:50%;z-index:-1}
+.ear.l{left:4%}.ear.r{right:4%}
+.face{position:absolute;left:14%;top:9%;width:72%;aspect-ratio:1;border-radius:50%;border:3px solid var(--ink);background:#ffd9b0 center/cover}
+.paw{position:absolute;bottom:6%;width:22%;height:12%;background:#f2b58a;border:3px solid var(--ink);border-radius:50%}
+.paw.l{left:16%}.paw.r{right:16%}
+.rim{position:absolute;left:4%;right:4%;bottom:4%;height:20%;border-radius:50%;background:radial-gradient(ellipse at 50% 0,transparent 55%,var(--grass2) 57%)}
+/* mini floor plan */
+.miniplan{width:min(82%,400px,calc(146cqh - 16px));background:var(--teal);border:3px solid var(--ink);border-radius:18px;padding:8px;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;transform:rotate(2.5deg)}
+.miniplan i{aspect-ratio:1;border-radius:6px;background:#ffffff1c;border:2px dashed #ffffff45;display:grid;place-items:center;padding:2px}
+.miniplan i.st{background:#ffd23f2a;border-color:#ffd23f80}
+.miniplan i.f{background:#fff;border:2px solid var(--ink)}
+.miniplan i.f.st{background:#fff6d8}
+.miniplan svg{width:100%;height:100%}
+@media(max-width:767px),(orientation:portrait) and (max-width:1023px){.games{grid-template-columns:minmax(0,1fr)}}
+@media(min-width:768px) and (max-width:1023px) and (orientation:portrait){.home{height:100dvh;min-height:0}.games{grid-template-rows:1fr 1fr}}
+@media(max-width:767px){.art{container-type:normal}.lawn,.miniplan{width:min(80%,360px)}}
+@media(max-height:620px) and (orientation:landscape){.art{display:none}.g{grid-template-rows:auto auto 1fr auto}}
+@media(prefers-reduced-motion:reduce){.idle .tag,.idle .mole.peek{animation:none}.g{transition:none}}
 </style>
 </head>
 <body>
-<main>
-  <h1>Event Club of BUV</h1>
-  <p class="lead">Ghé booth, chơi một ván, rồi tìm hiểu cách tụi mình làm nên các sự kiện!</p>
+<main class="home" id="home">
+  <header>
+    <div><h1>Event Club of BUV</h1><p>Ghé booth, chơi một ván, rồi hỏi tụi mình cách làm nên một sự kiện!</p></div>
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#e23b2e" stroke="#22140f" stroke-width="3"/><text x="32" y="42" font-size="27" font-family="Baloo 2,sans-serif" font-weight="800" text-anchor="middle" fill="#ffcf3a">EC</text></svg>
+  </header>
   <div class="games">
-    <a class="g m" href="dap-chuot/"><h2>Đập Chuột</h2><p>Gắn mặt bạn bè lên chú chuột và đập thật nhiều trong 30 giây.</p><span>Chơi ngay</span></a>
-    <a class="g s" href="dung-san-khau/"><h2>Dựng Sân Khấu</h2><p>Làm trưởng ban tổ chức: 90 giây, một brief, một ngân sách.</p><span>Chơi ngay</span></a>
+    <a class="g m" href="dap-chuot/">
+      <span class="tag">30 giây!</span>
+      <h2>Đập Chuột</h2>
+      <p>Gắn mặt bạn bè lên chú chuột và đập thật nhiều trong 30 giây.</p>
+      <div class="art" aria-hidden="true"><div class="lawn" id="lawn"></div></div>
+      <div class="foot"><div class="rec" id="recM">Kỷ lục booth<b>Chưa có ai</b></div><span class="cta">Chơi ngay</span></div>
+    </a>
+    <a class="g s" href="dung-san-khau/">
+      <span class="tag">90 giây!</span>
+      <h2>Dựng Sân Khấu</h2>
+      <p>Làm trưởng ban tổ chức: một brief, một ngân sách, 90 giây.</p>
+      <div class="art" aria-hidden="true"><div class="miniplan" id="miniplan"></div></div>
+      <div class="foot"><div class="rec" id="recS">Kỷ lục booth<b>Chưa có ai</b></div><span class="cta">Chơi ngay</span></div>
+    </a>
   </div>
-  <footer>Event Club of BUV · Booth giới thiệu câu lạc bộ</footer>
+  <footer><span>Event Club of BUV · Booth giới thiệu câu lạc bộ</span><span>Muốn tham gia? Hỏi các anh chị ở booth nhé!</span></footer>
 </main>
+<script>
+{
+const I={
+stage:'<rect x="2" y="6" width="36" height="28" rx="3" fill="#c98a4b" stroke="#10201f" stroke-width="2.5"/><path d="M2 15h36M2 25h36" stroke="#8a5a2b" stroke-width="2"/>',
+speaker:'<rect x="9" y="3" width="22" height="34" rx="3" fill="#2b2f33" stroke="#10201f" stroke-width="2"/><circle cx="20" cy="13" r="5" fill="#666"/><circle cx="20" cy="27" r="7" fill="#555" stroke="#888" stroke-width="2"/>',
+mic:'<path d="M20 22v14M13 36h14" stroke="#10201f" stroke-width="3" stroke-linecap="round"/><rect x="14" y="3" width="12" height="20" rx="6" fill="#9aa3ab" stroke="#10201f" stroke-width="2.5"/><path d="M14 10h12M14 14h12" stroke="#5b636a" stroke-width="1.5"/>',
+warm:'<circle cx="20" cy="20" r="17" fill="#ffd23f55"/><circle cx="20" cy="20" r="9" fill="#ffc23a" stroke="#10201f" stroke-width="2.5"/><circle cx="17" cy="17" r="3" fill="#fff8"/>',
+chair:'<rect x="9" y="5" width="22" height="8" rx="3" fill="#0f6b66" stroke="#10201f" stroke-width="2"/><rect x="9" y="14" width="22" height="20" rx="3" fill="#2fa39b" stroke="#10201f" stroke-width="2"/>',
+sofa:'<rect x="3" y="8" width="34" height="26" rx="10" fill="#ff8a6a" stroke="#10201f" stroke-width="2.5"/><rect x="9" y="15" width="22" height="14" rx="6" fill="#ffb59f"/>',
+};
+const ic=id=>`<svg viewBox="0 0 40 40">${I[id]}</svg>`;
+const mole=up=>`<div class="hole"><div class="pit"><div class="mole${up?' up peek':''}"><span class="ear l"></span><span class="ear r"></span><div class="body"></div><span class="face"></span><span class="paw l"></span><span class="paw r"></span></div></div><div class="rim"></div></div>`;
+document.getElementById('lawn').innerHTML=[0,1,0].map(mole).join('');
+const mp={0:'speaker',1:'stage',2:'stage',3:'stage',4:'speaker',7:'mic',8:'warm',9:'mic',13:'chair',14:'sofa',15:'chair',16:'sofa'};
+document.getElementById('miniplan').innerHTML=Array.from({length:24},(_,k)=>`<i class="${k<12?'st':''}${mp[k]?' f':''}">${mp[k]?ic(mp[k]):''}</i>`).join('');
+// booth records from each game's leaderboard (same keys the games write)
+const top=k=>{try{const l=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(l)&&l[0]?l[0]:null}catch(e){return null}};
+const put=(id,r,unit)=>{if(!r)return;const b=document.querySelector(id+' b');b.textContent=`${r.n} · ${r.s}${unit}`;b.title=b.textContent};
+put('#recM',top('ec-whack-lb'),'');put('#recS',top('ec-stage-lb'),' điểm');
+// attract mode: wiggle after 8s with no input
+const home=document.getElementById('home');let it=0;
+const wake=()=>{home.classList.remove('idle');clearTimeout(it);it=setTimeout(()=>home.classList.add('idle'),8000)};
+['pointerdown','pointermove','keydown','scroll'].forEach(e=>addEventListener(e,wake,{passive:true}));wake();
+}
+</script>
 </body>
 </html>

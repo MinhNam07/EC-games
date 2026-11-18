@@ -15,9 +15,11 @@
    PICTURE: the 3x3 lawn of holes where photo-faced moles pop up
    COLOUR and TYPE: tomato-red cabinet on sunflower yellow, grass green lawn; Baloo 2 + Be Vietnam Pro
    LAYOUT: cabinet centred, HUD on top, leaderboard beside (stacks on phones), overlays for start/end */
-:root{color-scheme:light dark;--bg:light-dark(#ffcf3a,#2b100d);--ink:light-dark(#22140f,#fff1e0);--red:#e23b2e;--red2:#a92519;--yel:#ffcf3a;--card:light-dark(#fffaf0,#3a1814);--grass:#63b94b;--grass2:#3f8d34;--line:light-dark(#22140f,#ffcf3a)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+/* THEME: locked light — the booth is a fixed scene; shared tokens with the other two pages */
+:root{color-scheme:light;--bg:#ffcf3a;--ink:#22140f;--red:#e23b2e;--red2:#a92519;--yel:#ffcf3a;--card:#fffaf0;--paper:#fffaf0;--grass:#63b94b;--grass2:#3f8d34;--line:#22140f;--lift:0 5px 0 #22140f}
+::selection{background:#22140f;color:#ffcf3a}
 *{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Be Vietnam Pro",system-ui,sans-serif;overflow-x:clip;min-height:100vh}
 h1,h2,h3,.big{font-family:"Baloo 2",sans-serif;line-height:1.05;margin:0}
 .wrap{max-width:1180px;margin:0 auto;padding:clamp(14px,3vw,36px) max(4vw,12px);display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
@@ -32,9 +34,13 @@ h1,h2,h3,.big{font-family:"Baloo 2",sans-serif;line-height:1.05;margin:0}
 .stat{background:#22140f;color:#fff1e0;border-radius:14px;padding:6px 12px;text-align:center}
 .stat b{font:800 clamp(24px,4.5vw,34px)/1 "Baloo 2",sans-serif;display:block;color:var(--yel)}
 .stat span{font-size:13px;opacity:.8}
+.stat{transition:background-color .2s}
+.stat.low{background:var(--red2)}.stat.low b{color:#fff}
+.stat.low.tick{animation:tick .3s ease-out}
+@keyframes tick{0%{transform:scale(1.08)}100%{transform:scale(1)}}
 .tbar{height:10px;background:#22140f;border-radius:9px;overflow:hidden;margin-bottom:12px}
 .tbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffcf3a,#ff8a2a);transition:width .1s linear}
-.board{max-width:min(100%,calc(100vh - 280px),720px);margin:0 auto;background:radial-gradient(circle at 30% 20%,#7fd067,var(--grass) 60%,var(--grass2));border:3px solid #22140f;border-radius:20px;padding:clamp(8px,2vw,18px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(6px,1.6vw,16px);touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect x='20' y='18' width='8' height='28' rx='3' fill='%23a0622d' stroke='%2322140f' stroke-width='2'/%3E%3Crect x='6' y='4' width='36' height='18' rx='6' fill='%23e23b2e' stroke='%2322140f' stroke-width='2.5'/%3E%3C/svg%3E") 24 12,pointer}
+.board{max-width:min(100%,calc(100dvh - 322px),720px);margin:0 auto;background:radial-gradient(circle at 30% 20%,#7fd067,var(--grass) 60%,var(--grass2));border:3px solid #22140f;border-radius:20px;padding:clamp(8px,2vw,18px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(6px,1.6vw,16px);touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect x='20' y='18' width='8' height='28' rx='3' fill='%23a0622d' stroke='%2322140f' stroke-width='2'/%3E%3Crect x='6' y='4' width='36' height='18' rx='6' fill='%23e23b2e' stroke='%2322140f' stroke-width='2.5'/%3E%3C/svg%3E") 24 12,pointer}
 .board.shake{animation:shake .35s}
 @media(max-height:560px){.board{max-width:min(100%,420px)}}
 @keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
@@ -73,7 +79,9 @@ label{font-weight:700;display:block;margin:10px 0 6px}
 input[type=text]{width:100%;font:16px "Be Vietnam Pro",system-ui,sans-serif;padding:12px 14px;border:3px solid #22140f;border-radius:12px;background:#fff;color:#22140f}
 .btn{font:800 20px "Baloo 2",sans-serif;min-height:48px;padding:8px 22px;border:3px solid #22140f;border-radius:14px;background:var(--red);color:#fff;cursor:pointer;box-shadow:0 5px 0 #22140f;transition:transform .08s}
 .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #22140f}
+a.btn,label.btn{display:inline-grid;place-items:center;text-decoration:none;margin:0}
 .btn.alt{background:var(--yel);color:#22140f}
+.btn.paper{background:var(--paper);color:#22140f}
 .btn.sm{font-size:16px;min-height:44px;padding:6px 14px}
 .btn:focus-visible,input:focus-visible{outline:3px solid #2a7cff;outline-offset:2px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
@@ -82,7 +90,17 @@ input[type=text]{width:100%;font:16px "Be Vietnam Pro",system-ui,sans-serif;padd
 .thumbs img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid #22140f}
 .thumbs button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;border:2px solid #22140f;background:#fff;color:#22140f;font-weight:800;cursor:pointer;line-height:1;padding:0}
 .note{font-size:13px;opacity:.8}
+.camwrap{position:relative;width:min(300px,100%);aspect-ratio:1;margin:10px auto;border-radius:50%;overflow:hidden;border:5px solid #22140f;background:#000}
+.camwrap video{width:100%;height:100%;object-fit:cover}
+.camwrap video.mirror{transform:scaleX(-1)}
+.camwrap .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.camwrap .flash.on{animation:flash .35s}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
 .count{font:800 clamp(90px,20vw,160px)/1 "Baloo 2",sans-serif;color:var(--yel);-webkit-text-stroke:4px #22140f;paint-order:stroke}
+.rankbadge{display:inline-block;font:800 22px/1.2 "Baloo 2",sans-serif;background:var(--yel);border:3px solid #22140f;border-radius:999px;padding:4px 16px;margin:4px 0 10px;box-shadow:0 3px 0 #22140f}
+.rankbadge.rec{background:var(--red);color:#fff;animation:recpop .6s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes recpop{0%{transform:scale(.4) rotate(-8deg);opacity:0}100%{transform:rotate(-2deg);opacity:1}}
+.score-big.go{animation:recpop .5s cubic-bezier(.2,.9,.3,1.4) both}
 .score-big{font:800 clamp(56px,12vw,88px)/1 "Baloo 2",sans-serif;color:var(--red)}
 .side{display:grid;gap:16px}
 .card{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:16px 18px}
@@ -100,7 +118,7 @@ ol li.me{background:#ffcf3a55;border-radius:8px}
 .legend i{width:30px;height:30px;border-radius:50%;border:3px solid #22140f;flex:none}
 .empty{opacity:.7;font-size:15px}
 .linkbtn{background:none;border:0;color:inherit;text-decoration:underline;font:13px "Be Vietnam Pro",system-ui,sans-serif;cursor:pointer;padding:8px 0;min-height:44px}
-@media(prefers-reduced-motion:reduce){.bulbs,.board.shake,.pop{animation:none}.mole{transition:none}}
+@media(prefers-reduced-motion:reduce){.bulbs,.board.shake,.pop,.stat.low.tick,.rankbadge.rec,.score-big.go{animation:none}.mole{transition:none}}
 </style>
 </head>
 <body>
@@ -108,12 +126,12 @@ ol li.me{background:#ffcf3a55;border-radius:8px}
   <main class="cab" id="cab">
     <div class="marq"><div class="bulbs"></div>
       <div><h1>Đập Chuột!</h1><small>Event Club of BUV</small></div>
-      <div class="row" style="margin:0"><button class="btn sm" id="quitBtn" hidden>Bỏ cuộc</button><button class="btn alt sm" id="soundBtn" aria-pressed="true">Âm thanh: bật</button></div>
+      <div class="row" style="margin:0"><button class="btn paper sm" id="quitBtn" hidden>Bỏ cuộc</button><button class="btn paper sm" id="soundBtn" aria-pressed="true">Âm thanh: bật</button></div>
     </div>
     <div class="hud">
       <div class="stat"><b id="sc">0</b><span>Điểm</span></div>
       <div class="stat"><b id="cb">x1</b><span>Combo</span></div>
-      <div class="stat"><b id="tm">30</b><span>Giây</span></div>
+      <div class="stat" id="tmStat"><b id="tm">30</b><span>Giây</span></div>
     </div>
     <div class="tbar"><i id="tb"></i></div>
     <div class="board" id="board"></div>
@@ -126,16 +144,32 @@ ol li.me{background:#ffcf3a55;border-radius:8px}
         <input type="text" id="nm" maxlength="20" placeholder="Ví dụ: Minh Anh" autocomplete="off">
         <label for="file">Mặt cho chuột (tối đa 4 ảnh)</label>
         <div class="row" style="margin-top:0">
-          <label class="btn alt sm" for="file" style="margin:0;display:inline-grid;place-items:center">Chụp / chọn ảnh</label>
-          <input type="file" id="file" accept="image/*" capture="user" multiple hidden>
-          <span class="note" id="faceNote">Chưa có ảnh: dùng mặt mặc định</span>
+          <button class="btn alt sm" id="camBtn">Chụp ảnh</button>
+          <label class="btn alt sm" for="file">Chọn ảnh</label>
+          <input type="file" id="file" accept="image/*" multiple hidden>
+          <input type="file" id="capFile" accept="image/*" capture="user" hidden>
         </div>
+        <p class="note" id="faceNote" style="margin:6px 0 0">Chưa có ảnh: dùng mặt mặc định</p>
         <div class="thumbs" id="thumbs"></div>
         <p class="note">Chỉ dùng ảnh của người đã đồng ý. Ảnh chỉ nằm trên máy này và mất khi tải lại trang.</p>
-        <div class="row"><button class="btn" id="startBtn">Bắt đầu!</button></div>
+        <div class="row"><button class="btn" id="startBtn">Bắt đầu!</button><a class="btn alt sm" href="/">← Đổi game</a></div>
       </div>
     </div>
 
+    <div class="ov" id="ovCam" hidden style="z-index:12">
+      <div class="panel" style="text-align:center">
+        <h2 style="font-size:30px">Cười lên nào!</h2>
+        <div class="camwrap"><video id="vid" playsinline muted autoplay></video><div class="flash" id="flash"></div></div>
+        <p class="note" id="camMsg">Đang mở camera...</p>
+        <div class="thumbs" id="camThumbs" style="justify-content:center"></div>
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="snapBtn">Chụp</button>
+          <button class="btn alt" id="flipBtn">Đổi camera</button>
+          <label class="btn alt" for="capFile" id="capAlt" hidden>Dùng app camera</label>
+          <button class="btn alt" id="camClose">Xong</button>
+        </div>
+      </div>
+    </div>
     <div class="ov" id="ovCount" hidden><div class="count" id="countN">3</div></div>
 
     <div class="ov" id="ovEnd" hidden>
@@ -144,11 +178,12 @@ ol li.me{background:#ffcf3a55;border-radius:8px}
         <div class="score-big" id="endScore">0</div>
         <h2 id="endTitle" style="font-size:30px">Búa thần EC</h2>
         <p id="endStats"></p>
-        <p id="endRank" style="font-weight:700"></p>
+        <p id="endRank" class="rankbadge"></p>
         <p class="note">Thích cảm giác "cháy" như này? Ghé hỏi các anh chị EC về sự kiện sắp tới nhé!</p>
         <div class="row" style="justify-content:center">
           <button class="btn" id="againBtn">Chơi lại</button>
           <button class="btn alt" id="nextBtn">Người tiếp theo</button>
+          <a class="btn alt" href="/">← Đổi game</a>
         </div>
       </div>
     </div>
@@ -194,8 +229,38 @@ renderLb(-1);
 
 function renderThumbs(){$('#thumbs').innerHTML=faces.map((f,i)=>`<div><img src="${f}" alt="Mặt ${i+1}"><button data-k="${i}" aria-label="Bỏ ảnh ${i+1}">×</button></div>`).join('');$('#faceNote').textContent=faces.length?`${faces.length} ảnh đã sẵn sàng`:'Chưa có ảnh: dùng mặt mặc định'}
 $('#thumbs').addEventListener('click',e=>{const k=e.target.dataset.k;if(k!==undefined){faces.splice(+k,1);renderThumbs()}});
-$('#file').addEventListener('change',e=>{[...e.target.files].slice(0,4-faces.length).forEach(file=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),S=256;c.width=c.height=S;const s=Math.min(im.width,im.height),ctx=c.getContext('2d');ctx.drawImage(im,(im.width-s)/2,(im.height-s)/2*0.7,s,s,0,0,S,S);if(faces.length<4)faces.push(c.toDataURL('image/jpeg',.85));renderThumbs()};im.src=r.result};r.readAsDataURL(file)});e.target.value=''});
-
+function addImage(src,mirror){if(faces.length>=4)return;const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),S=256;c.width=c.height=S;const w=im.videoWidth||im.width,h=im.videoHeight||im.height,s=Math.min(w,h),ctx=c.getContext('2d');if(mirror){ctx.translate(S,0);ctx.scale(-1,1)}ctx.drawImage(im,(w-s)/2,(h-s)/2*0.7,s,s,0,0,S,S);faces.push(c.toDataURL('image/jpeg',.85));renderThumbs()};im.src=src}
+function onFiles(e){[...e.target.files].slice(0,4-faces.length).forEach(file=>{const r=new FileReader();r.onload=()=>addImage(r.result);r.readAsDataURL(file)});e.target.value=''}
+$('#file').addEventListener('change',onFiles);
+$('#capFile').addEventListener('change',e=>{onFiles(e);closeCam()});
+// live camera (needs https, e.g. Vercel)
+let stream=null,facing='user';
+const vid=$('#vid');
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}vid.srcObject=null}
+function closeCam(){stopCam();$('#ovCam').hidden=true}
+function camFail(msg){stopCam();$('#camMsg').textContent=msg;$('#snapBtn').hidden=true;$('#flipBtn').hidden=true;$('#capAlt').hidden=false}
+async function startCam(){
+  stopCam();$('#snapBtn').hidden=false;$('#flipBtn').hidden=false;$('#capAlt').hidden=true;$('#camMsg').textContent='Đang mở camera...';
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){camFail('Trình duyệt này không mở được camera trong trang (cần https). Bấm "Dùng app camera" hoặc "Chọn ảnh".');return}
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:720},height:{ideal:720}},audio:false});
+    vid.srcObject=stream;vid.classList.toggle('mirror',facing==='user');await vid.play();
+    $('#camMsg').textContent=`Đưa mặt vào giữa vòng tròn rồi bấm Chụp (${faces.length}/4 ảnh)`;
+  }catch(e){
+    camFail(e&&e.name==='NotAllowedError'?'Camera đang bị chặn. Bấm biểu tượng bên trái thanh địa chỉ để cho phép Camera rồi bấm "Chụp ảnh" lại, hoặc dùng "Dùng app camera".':e&&e.name==='NotFoundError'?'Không tìm thấy camera trên máy này. Hãy dùng "Chọn ảnh".':'Không mở được camera ('+(e&&e.name||'lỗi')+'). Thử "Dùng app camera" hoặc "Chọn ảnh".');
+  }
+}
+function renderCamThumbs(){$('#camThumbs').innerHTML=faces.map((f,i)=>`<div><img src="${f}" alt="Ảnh ${i+1}"></div>`).join('')}
+$('#camBtn').addEventListener('click',()=>{if(faces.length>=4){$('#faceNote').textContent='Đã đủ 4 ảnh, bấm × để bỏ bớt';return}$('#ovCam').hidden=false;renderCamThumbs();startCam()});
+$('#snapBtn').addEventListener('click',()=>{
+  if(!stream||!vid.videoWidth)return;
+  const c=document.createElement('canvas');c.width=vid.videoWidth;c.height=vid.videoHeight;c.getContext('2d').drawImage(vid,0,0);
+  const fl=$('#flash');fl.classList.remove('on');void fl.offsetWidth;fl.classList.add('on');beep(1200,.05,'square',.08);
+  addImage(c.toDataURL('image/jpeg',.9),facing==='user');
+  setTimeout(()=>{renderCamThumbs();$('#camMsg').textContent=`Đã chụp ${faces.length}/4 ảnh`;if(faces.length>=4)setTimeout(closeCam,500)},120);
+});
+$('#flipBtn').addEventListener('click',()=>{facing=facing==='user'?'environment':'user';startCam()});
+$('#camClose').addEventListener('click',closeCam);
 function setHud(){$('#sc').textContent=score;$('#cb').textContent='x'+combo}
 function popText(x,y,txt,cls){const p=document.createElement('div');p.className='pop '+(cls||'');p.textContent=txt;p.style.left=x+'px';p.style.top=y+'px';board.appendChild(p);setTimeout(()=>p.remove(),700)}
 
@@ -232,13 +297,13 @@ board.addEventListener('pointerdown',e=>{
 function startCountdown(){
   lastName=$('#nm').value.trim()||'Người chơi bí ẩn';
   $('#ovStart').hidden=true;$('#ovEnd').hidden=true;$('#ovCount').hidden=false;
-  score=0;combo=1;streak=0;hits=0;swings=0;setHud();$('#tm').textContent=DUR;$('#tb').style.width='100%';
+  score=0;combo=1;streak=0;hits=0;swings=0;setHud();$('#tm').textContent=DUR;$('#tmStat').classList.remove('low');$('#tb').style.width='100%';
   let n=3;$('#countN').textContent=n;beep(440,.12);state='count';$('#quitBtn').hidden=false;
   clearInterval(iv);iv=setInterval(()=>{n--;if(n>0){$('#countN').textContent=n;beep(440,.12)}else{clearInterval(iv);$('#ovCount').hidden=true;beep(880,.2);play()}},700);
 }
-function play(){state='play';t0=performance.now();spawn();tick=setInterval(()=>{const left=Math.max(0,DUR-(performance.now()-t0)/1000);$('#tm').textContent=Math.ceil(left);$('#tb').style.width=(left/DUR*100)+'%';if(left<=0)end()},100)}
+function play(){state='play';t0=performance.now();spawn();tick=setInterval(()=>{const left=Math.max(0,DUR-(performance.now()-t0)/1000);const sec=Math.ceil(left);if($('#tm').textContent!=sec){$('#tm').textContent=sec;const ts=$('#tmStat');ts.classList.toggle('low',sec<=5);if(sec<=5&&sec>0){ts.classList.remove('tick');void ts.offsetWidth;ts.classList.add('tick');beep(sec<=2?990:740,.05,'square',.05)}}$('#tb').style.width=(left/DUR*100)+'%';if(left<=0)end()},100)}
 function stopAll(){state='idle';clearInterval(iv);clearInterval(tick);clearTimeout(spawnT);holes.forEach(hide);$('#quitBtn').hidden=true}
-function quit(){if(state==='idle')return;stopAll();score=0;combo=1;setHud();$('#tm').textContent=DUR;$('#tb').style.width='100%';$('#ovCount').hidden=true;$('#ovEnd').hidden=true;$('#ovStart').hidden=false}
+function quit(){if(state==='idle')return;stopAll();score=0;combo=1;setHud();$('#tm').textContent=DUR;$('#tmStat').classList.remove('low');$('#tb').style.width='100%';$('#ovCount').hidden=true;$('#ovEnd').hidden=true;$('#ovStart').hidden=false}
 function end(){
   stopAll();
   beep(660,.15);setTimeout(()=>beep(990,.3),150);
@@ -248,7 +313,8 @@ function end(){
   renderLb(pos<10?pos:-1);
   $('#endName').textContent=lastName;$('#endScore').textContent=score;$('#endTitle').textContent=title;
   $('#endStats').textContent=`${hits} cú trúng · độ chính xác ${acc}%`;
-  $('#endRank').textContent=pos===0?'Kỷ lục mới của booth!':pos<10?`Bạn đang đứng hạng ${pos+1} trên bảng vàng`:'Chưa vào top 10, thử lại nhé!';
+  const rb=$('#endRank');rb.classList.toggle('rec',pos===0);const es=$('#endScore');es.classList.remove('go');void es.offsetWidth;es.classList.add('go');if(pos===0)[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16,'triangle',.1),350+i*130));
+  rb.textContent=pos===0?'Kỷ lục mới của booth!':pos<10?`Bạn đang đứng hạng ${pos+1} trên bảng vàng`:'Chưa vào top 10, thử lại nhé!';
   $('#ovEnd').hidden=false;
 }
 $('#startBtn').addEventListener('click',startCountdown);
