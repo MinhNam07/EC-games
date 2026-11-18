@@ -27,3 +27,4 @@ python3 -m http.server 8000
 - Bảng xếp hạng được lưu bằng `localStorage` trên trình duyệt của máy đang chạy game. Đổi máy hoặc đổi trình duyệt là bảng trống.
 - Ảnh khuôn mặt chỉ nằm trong bộ nhớ trang: không upload đi đâu, và mất khi tải lại trang.
 - Font chữ được tải từ Google Fonts, nên máy cần có mạng. Nếu không có mạng, game vẫn chạy nhưng dùng font hệ thống.
+# EC-games
