@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dựng Sân Khấu EC</title>
-<meta name="description" content="Game dựng sân khấu: làm trưởng ban tổ chức trong 90 giây cùng Event Club of BUV.">
+<meta name="description" content="Game dựng sân khấu: làm trưởng ban tổ chức trong khoảng 2 phút cùng Event Club of BUV.">
 <meta name="theme-color" content="#dff0ec">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22%23e23b2e%22/%3E%3Ctext x=%2232%22 y=%2242%22 font-size=%2228%22 font-family=%22Arial%22 font-weight=%22900%22 text-anchor=%22middle%22 fill=%22%23ffcf3a%22%3EEC%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,6 +126,12 @@ input[type=text]{width:100%;font:16px var(--f-b);padding:12px 14px;border:var(--
 .bopt.rnd{background:var(--sun)}
 .bopt:focus-visible{outline:3px solid #2a7cff;outline-offset:2px}
 #ovStart .panel{width:min(760px,100%)}
+.tsel{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tsel button{font:700 14px var(--f-b);min-height:40px;padding:4px 14px;border:2px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);cursor:pointer}
+.tsel button[aria-pressed=true]{background:var(--ink);color:#fff}
+.tsel button:focus-visible{outline:3px solid #2a7cff;outline-offset:2px}
+.tcustom{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px}
+input[type=number]{width:96px;font:16px var(--f-b);padding:7px 10px;border:var(--bw) solid var(--ink);border-radius:10px;background:#fff;color:var(--ink);font-variant-numeric:tabular-nums}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
 
 #ovEnd .panel{width:min(880px,100%);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;text-align:left}
@@ -178,7 +184,7 @@ ol li.me{background:#ffd23f66;border-radius:8px}
       <div class="mrow"><span>Độ hype</span><div class="bar"><i class="hype" id="mH"></i></div><b id="tH">0%</b></div>
     </section>
     <div class="clock">
-      <div class="timer" id="timerBox"><span id="timer">90</span><small>giây</small></div>
+      <div class="timer" id="timerBox"><span id="timer">2:00</span><small>còn lại</small></div>
       <button class="btn pri" id="doneBtn">Chốt phương án</button>
     </div>
   </div>
@@ -200,9 +206,15 @@ ol li.me{background:#ffd23f66;border-radius:8px}
 <div class="ov" id="ovStart">
   <div class="panel">
     <h2>Khách hàng vừa gửi brief!</h2>
-    <p style="margin:0">Bạn là trưởng ban tổ chức của Event Club of BUV. Chọn một sự kiện, rồi trong 90 giây dựng sân khấu đủ yêu cầu, đúng không khí và không vượt ngân sách.</p>
+    <p style="margin:0">Bạn là trưởng ban tổ chức của Event Club of BUV. Chọn một sự kiện, rồi trong khoảng 2 phút dựng sân khấu đủ yêu cầu, đúng không khí và không vượt ngân sách.</p>
     <label for="nm">Tên của bạn</label>
     <input type="text" id="nm" maxlength="20" placeholder="Ví dụ: Gia Huy" autocomplete="off">
+    <label id="tlab">Thời gian mỗi màn</label>
+    <div class="tsel" id="tsel" role="group" aria-labelledby="tlab">
+      <button data-t="auto">Theo sự kiện</button><button data-t="90">1:30</button><button data-t="120">2:00</button><button data-t="180">3:00</button><button data-t="custom">Tuỳ chỉnh</button>
+      <span class="tcustom" id="tcustom" hidden><input type="number" id="tsec" min="30" max="600" step="15" value="150" aria-label="Số giây mỗi màn"> giây</span>
+    </div>
+    <p class="note" id="tnote" style="margin:6px 0 0"></p>
     <label>Chọn sự kiện</label>
     <div class="briefs" id="briefs"></div>
     <div class="actions"><a class="btn ghost sm" href="/">← Đổi game</a></div>
@@ -238,7 +250,7 @@ ol li.me{background:#ffd23f66;border-radius:8px}
 <script>
 {
 const $=s=>document.querySelector(s);
-const COLS=8,ROWS=6,STAGE_ROWS=2,TIME=90,KEY='ec-stage-lb';
+const COLS=8,ROWS=6,STAGE_ROWS=2,TIME=120,KEY='ec-stage-lb';
 const V={chill:'Chill, ấm cúng',sang:'Sang trọng',hype:'Bùng nổ',pro:'Chuyên nghiệp'};
 const TAG={stage:'Sàn sân khấu',runway:'Sàn catwalk',sound:'Loa',mic:'Micro',light:'Đèn',laser:'Laser',screen:'Màn hình',seat:'Chỗ ngồi',sec:'Bảo vệ',photo:'Thợ ảnh',decor:'Trang trí',drink:'Quầy nước'};
 // icons: 40x40 top-down sprites
@@ -302,7 +314,27 @@ $('#soundBtn').addEventListener('click',e=>{sound=!sound;e.currentTarget.textCon
 $('#items').innerHTML=ITEMS.map(i=>`<button class="it" data-id="${i.id}">${icon(i.id)}<span>${i.n}<small>${fmt(i.c)}tr · ${i.z==='s'?'sân khấu':i.z==='a'?'khán giả':'mọi khu'}</small></span></button>`).join('');
 $('#grid').innerHTML=grid.map((_,k)=>(k===STAGE_ROWS*COLS?'<div class="divider" aria-hidden="true">Mép sân khấu</div>':'')+`<div class="cell${Math.floor(k/COLS)<STAGE_ROWS?' st':''}" data-k="${k}" tabindex="0" role="button" aria-label="Ô ${k+1}"></div>`).join('');
 const cells=[...document.querySelectorAll('.cell')];
-$('#briefs').innerHTML=BRIEFS.map((b,i)=>`<button class="bopt" data-b="${i}"><b>${b.n}</b>${b.d}<small>Ngân sách ${b.b}tr · ${V[b.vibe]}</small></button>`).join('')+`<button class="bopt rnd" data-b="r"><b>Bốc thăm ngẫu nhiên</b>Để số phận chọn giúp bạn.</button>`;
+// Thời gian mỗi màn: "theo sự kiện" ước tính từ độ khó của brief (đọc brief ~15s, mỗi loại thiết bị ~6s để tìm và chọn,
+// mỗi ô ~1,5s để đặt, ~20s chỉnh ngân sách/không khí, ×1,3 cho người chơi lần đầu), làm tròn lên bội số 15s.
+// Kết quả: Acoustic 2:00, Fashion 2:15, EDM 2:15, Talkshow 2:00, Gala 2:30. Staff có thể chọn mốc cố định hoặc tự nhập số giây.
+const TKEY='ec-stage-time',PRESETS=['auto','90','120','180'];
+const suggest=b=>{const r=Object.values(b.req);return Math.ceil((15+r.length*6+r.reduce((a,x)=>a+x,0)*1.5+20)*1.3/15)*15};
+const clampT=x=>Math.max(30,Math.min(600,Math.round(+x||TIME)));
+const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+let tmode='auto';try{const v=localStorage.getItem(TKEY);if(v==='auto'||+v>0)tmode=v==='auto'?v:String(clampT(v))}catch(e){}
+let tcust=!PRESETS.includes(tmode),dur=TIME;
+const durFor=b=>tmode==='auto'?suggest(b):clampT(tmode);
+function renderBriefs(){$('#briefs').innerHTML=BRIEFS.map((b,i)=>`<button class="bopt" data-b="${i}"><b>${b.n}</b>${b.d}<small>${mmss(durFor(b))} · Ngân sách ${b.b}tr · ${V[b.vibe]}</small></button>`).join('')+`<button class="bopt rnd" data-b="r"><b>Bốc thăm ngẫu nhiên</b>Để số phận chọn giúp bạn.<small>${tmode==='auto'?'Thời gian theo sự kiện':mmss(clampT(tmode))}</small></button>`}
+function renderTsel(){
+  document.querySelectorAll('#tsel button').forEach(b=>b.setAttribute('aria-pressed',tcust?b.dataset.t==='custom':b.dataset.t===tmode));
+  $('#tcustom').hidden=!tcust;if(tcust)$('#tsec').value=clampT(tmode);
+  $('#tnote').textContent=tmode==='auto'?'Mỗi sự kiện có thời gian riêng theo độ khó, trung bình khoảng 2 phút.':`Mọi sự kiện đều chơi trong ${mmss(clampT(tmode))}.`;
+  renderBriefs();if(state!=='play')tm.textContent=mmss(tmode==='auto'?TIME:clampT(tmode));
+}
+function setT(v){tmode=v;try{localStorage.setItem(TKEY,v)}catch(e){}renderTsel()}
+$('#tsel').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t==='custom'){tcust=true;setT(String(clampT($('#tsec').value)));$('#tsec').focus();$('#tsec').select()}else{tcust=false;setT(b.dataset.t)}});
+$('#tsec').addEventListener('change',e=>setT(String(clampT(e.target.value))));
+$('#tsec').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();setT(String(clampT(e.target.value)))}});
 
 function selItem(id){sel=id;document.querySelectorAll('.it').forEach(b=>b.classList.toggle('sel',b.dataset.id===id))}
 selItem(sel);
@@ -356,28 +388,29 @@ $('#undoBtn').addEventListener('click',()=>{if(state==='play'&&hist.length){grid
 $('#clearBtn').addEventListener('click',()=>{if(state==='play'&&grid.some(Boolean)){hist.push(grid.slice());grid.fill(null);render();beep(220,.12,'triangle',.08)}});
 $('#doneBtn').addEventListener('click',()=>{if(state==='play')finish()});
 const tm=$('#timer'),tbox=$('#timerBox');
-function resetTimer(){tm.textContent=TIME;tbox.classList.remove('low','tick')}
+function resetTimer(){tm.textContent=mmss(state==='play'?dur:tmode==='auto'?TIME:clampT(tmode));tbox.classList.remove('low','tick')}
+renderTsel();
 $('#quitBtn').addEventListener('click',()=>{if(state!=='play')return;state='idle';clearInterval(tick);grid.fill(null);hist=[];render();resetTimer();$('#ovStart').hidden=false});
 
-function renderLb(hl){$('#lb').innerHTML=lb.length?lb.map((r,i)=>`<li class="${i===hl?'me':''}"><em>${i+1}</em><span>${esc(r.n)}<small>${esc(r.b)}</small></span><b>${r.s}</b></li>`).join(''):'<li style="display:block;opacity:.7">Chưa có ai. Hãy là Event Planner đầu tiên!</li>'}
+function renderLb(hl){$('#lb').innerHTML=lb.length?lb.map((r,i)=>`<li class="${i===hl?'me':''}"><em>${i+1}</em><span>${esc(r.n)}<small>${esc(r.b)}${r.t?' · '+mmss(r.t):''}</small></span><b>${r.s}</b></li>`).join(''):'<li style="display:block;opacity:.7">Chưa có ai. Hãy là Event Planner đầu tiên!</li>'}
 renderLb(-1);
 
 function start(i){
   player=$('#nm').value.trim()||'Planner bí ẩn';
   brief=i==='r'?BRIEFS[Math.random()*BRIEFS.length|0]:BRIEFS[+i];
-  grid.fill(null);hist=[];doneReqs=0;state='play';tLeft=TIME;
+  grid.fill(null);hist=[];doneReqs=0;state='play';dur=durFor(brief);tLeft=dur;
   $('#who').textContent=`${player} đang làm trưởng ban`;
   $('#bName').textContent=brief.n;$('#bBudget').textContent=`Ngân sách: ${brief.b}tr`;$('#bVibe').textContent=`Không khí: ${V[brief.vibe]}`;
   $('#ovStart').hidden=true;$('#ovEnd').hidden=true;render();
   resetTimer();clearInterval(tick);beep(660,.1,'triangle',.08);
-  tick=setInterval(()=>{tLeft--;tm.textContent=tLeft;const low=tLeft<=15;tbox.classList.toggle('low',low);if(low){tbox.classList.remove('tick');void tbox.offsetWidth;tbox.classList.add('tick')}if(tLeft<=10&&tLeft>0)beep(tLeft<=3?990:740,.05,'square',.05);if(tLeft<=0)finish()},1000);
+  tick=setInterval(()=>{tLeft--;tm.textContent=mmss(Math.max(0,tLeft));const low=tLeft<=15;tbox.classList.toggle('low',low);if(low){tbox.classList.remove('tick');void tbox.offsetWidth;tbox.classList.add('tick')}if(tLeft<=10&&tLeft>0)beep(tLeft<=3?990:740,.05,'square',.05);if(tLeft<=0)finish()},1000);
 }
 $('#briefs').addEventListener('click',e=>{const b=e.target.closest('.bopt');if(b)start(b.dataset.b)});
 
 function finish(){
   state='idle';clearInterval(tick);
   const e=evaluate();let stars=e.total>=85?3:e.total>=65?2:e.total>=40?1:0;if(e.over>0)stars=Math.min(stars,1);
-  $('#eName').textContent=`${player} · ${brief.n}`;
+  $('#eName').textContent=`${player} · ${brief.n} · ${mmss(dur)}`;
   const st=$('#eStars');st.classList.remove('go');st.innerHTML=[0,1,2].map(i=>`<span class="${i<stars?'':'off'}">★</span>`).join('');void st.offsetWidth;st.classList.add('go');
   $('#eScore').textContent=e.total;
   $('#eTitle').textContent=['Cần thêm kinh nghiệm','Thực tập sinh sự kiện','Event Planner xịn','Trưởng ban tổ chức'][stars];
@@ -385,7 +418,7 @@ function finish(){
   $('#eTable').innerHTML=`<tr><td>Đáp ứng yêu cầu</td><td>${r1(e.req)} / 55</td></tr><tr><td>Đúng không khí "${V[brief.vibe]}"</td><td>${r1(e.vibe)} / 20</td></tr><tr><td>Ngân sách (${fmt(e.cost)}/${brief.b}tr)</td><td>${r1(e.bud)} / 20</td></tr><tr><td>Loa sát sân khấu</td><td>${e.place} / 10</td></tr>`;
   const miss=e.rows.filter(r=>!r.ok).map(r=>TAG[r.k]);
   $('#eTip').textContent=e.over>0?`Vượt ngân sách ${fmt(e.over)}tr: khách hàng sẽ không vui đâu!`:miss.length?`Còn thiếu: ${miss.join(', ')}.`:e.vibe<15?`Đủ đồ rồi, nhưng chưa đúng chất "${V[brief.vibe]}".`:'Phương án gần như hoàn hảo!';
-  const rec={n:player,b:brief.n,s:e.total};lb.push(rec);lb.sort((a,b)=>b.s-a.s);const pos=lb.indexOf(rec);lb=lb.slice(0,10);save();renderLb(pos<10?pos:-1);
+  const rec={n:player,b:brief.n,s:e.total,t:dur};lb.push(rec);lb.sort((a,b)=>b.s-a.s);const pos=lb.indexOf(rec);lb=lb.slice(0,10);save();renderLb(pos<10?pos:-1);
   $('#eRank').textContent=pos===0?'Kỷ lục mới của booth!':pos<10?`Bạn đứng hạng ${pos+1}`:'Chưa vào top 10, thử lại nhé!';
   [523,659,784,1047].slice(0,stars+1).forEach((f,i)=>setTimeout(()=>beep(f,.16,'triangle',.09),i*140));
   $('#ovEnd').hidden=false;

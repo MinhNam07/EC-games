@@ -6,7 +6,7 @@ Hai mini game web cho booth giới thiệu Event Club of BUV. Web tĩnh thuần 
 |---|---|
 | `/` | Trang chủ, chọn game |
 | `/dap-chuot/` | Đập Chuột: gắn mặt bạn bè lên chuột, chơi 30 giây |
-| `/dung-san-khau/` | Dựng Sân Khấu: làm trưởng ban tổ chức trong 90 giây |
+| `/dung-san-khau/` | Dựng Sân Khấu: làm trưởng ban tổ chức trong khoảng 2 phút (staff chỉnh được thời gian ở màn bắt đầu) |
 
 ## Chạy thử trên máy
 
