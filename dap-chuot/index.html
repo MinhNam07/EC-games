@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đập Chuột EC</title>
+<meta name="description" content="Game đập chuột gắn mặt bạn bè tại booth Event Club of BUV.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22%23e23b2e%22/%3E%3Ctext x=%2232%22 y=%2242%22 font-size=%2228%22 font-family=%22Arial%22 font-weight=%22900%22 text-anchor=%22middle%22 fill=%22%23ffcf3a%22%3EEC%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: loud, playful fairground booth game
+   IDEA: a carnival whack-a-mole cabinet with a marquee sign
+   PICTURE: the 3x3 lawn of holes where photo-faced moles pop up
+   COLOUR and TYPE: tomato-red cabinet on sunflower yellow, grass green lawn; Baloo 2 + Be Vietnam Pro
+   LAYOUT: cabinet centred, HUD on top, leaderboard beside (stacks on phones), overlays for start/end */
+:root{color-scheme:light dark;--bg:light-dark(#ffcf3a,#2b100d);--ink:light-dark(#22140f,#fff1e0);--red:#e23b2e;--red2:#a92519;--yel:#ffcf3a;--card:light-dark(#fffaf0,#3a1814);--grass:#63b94b;--grass2:#3f8d34;--line:light-dark(#22140f,#ffcf3a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Be Vietnam Pro",system-ui,sans-serif;overflow-x:clip;min-height:100vh}
+h1,h2,h3,.big{font-family:"Baloo 2",sans-serif;line-height:1.05;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:clamp(14px,3vw,36px) max(4vw,12px);display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+@media(max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.cab{background:var(--red);border:4px solid var(--line);border-radius:28px;padding:14px;box-shadow:0 10px 0 var(--red2),0 18px 30px #0004;position:relative}
+.marq{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--yel);color:#22140f;border:3px solid #22140f;border-radius:18px;padding:8px 16px;position:relative}
+.marq h1{font-size:clamp(30px,6vw,50px);font-weight:800;letter-spacing:.5px}
+.marq small{font-weight:700;font-size:14px;display:block}
+.bulbs{position:absolute;inset:-7px;pointer-events:none;border-radius:22px;background:radial-gradient(circle,#fff 0 3px,transparent 4px) 0 0/22px 22px;mask:linear-gradient(#000 0 0) top/100% 8px no-repeat,linear-gradient(#000 0 0) bottom/100% 8px no-repeat;-webkit-mask:linear-gradient(#000 0 0) top/100% 8px no-repeat,linear-gradient(#000 0 0) bottom/100% 8px no-repeat;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+.hud{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.stat{background:#22140f;color:#fff1e0;border-radius:14px;padding:6px 12px;text-align:center}
+.stat b{font:800 clamp(24px,4.5vw,34px)/1 "Baloo 2",sans-serif;display:block;color:var(--yel)}
+.stat span{font-size:13px;opacity:.8}
+.tbar{height:10px;background:#22140f;border-radius:9px;overflow:hidden;margin-bottom:12px}
+.tbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffcf3a,#ff8a2a);transition:width .1s linear}
+.board{max-width:min(100%,calc(100vh - 280px),720px);margin:0 auto;background:radial-gradient(circle at 30% 20%,#7fd067,var(--grass) 60%,var(--grass2));border:3px solid #22140f;border-radius:20px;padding:clamp(8px,2vw,18px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(6px,1.6vw,16px);touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect x='20' y='18' width='8' height='28' rx='3' fill='%23a0622d' stroke='%2322140f' stroke-width='2'/%3E%3Crect x='6' y='4' width='36' height='18' rx='6' fill='%23e23b2e' stroke='%2322140f' stroke-width='2.5'/%3E%3C/svg%3E") 24 12,pointer}
+.board.shake{animation:shake .35s}
+@media(max-height:560px){.board{max-width:min(100%,420px)}}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+.hole{position:relative;aspect-ratio:1/1}
+.hole::before{content:"";position:absolute;left:8%;right:8%;bottom:8%;height:26%;background:radial-gradient(ellipse at 50% 40%,#1c0f08,#4a2b17 70%);border-radius:50%}
+.pit{position:absolute;left:10%;right:10%;top:0;bottom:21%;overflow:hidden;border-radius:0 0 50% 50%/0 0 22% 22%}
+.mole{position:absolute;left:8%;right:8%;bottom:0;height:92%;transform:translateY(130%);transition:transform .14s ease-out}
+.mole.up{transform:translateY(6%)}
+.mole.down{transition-duration:.22s}
+.body{position:absolute;inset:0;background:linear-gradient(#9a6236,#6e4122);border:3px solid #22140f;border-bottom:0;border-radius:50% 50% 18% 18%/56% 56% 18% 18%}
+.ear{position:absolute;top:4%;width:22%;aspect-ratio:1;background:#9a6236;border:3px solid #22140f;border-radius:50%;z-index:-1}
+.ear.l{left:4%}.ear.r{right:4%}
+.face{position:absolute;left:14%;right:14%;top:9%;aspect-ratio:1;width:72%;border-radius:50%;object-fit:cover;border:3px solid #22140f;background:#ffd9b0}
+.paw{position:absolute;bottom:6%;width:22%;height:12%;background:#f2b58a;border:3px solid #22140f;border-radius:50%}
+.paw.l{left:16%}.paw.r{right:16%}
+.crown{display:none;position:absolute;left:30%;right:30%;top:-12%;height:22%;background:var(--yel);border:3px solid #22140f;clip-path:polygon(0 100%,0 20%,25% 60%,50% 0,75% 60%,100% 20%,100% 100%);z-index:2}
+.mole.gold .body{background:linear-gradient(#ffe37a,#e7a91c)}
+.mole.gold .ear{background:#ffe37a}
+.mole.gold .crown{display:block}
+.bombart{display:none;position:absolute;inset:4% 8% 0}
+.mole.bomb .body,.mole.bomb .ear,.mole.bomb .face,.mole.bomb .paw{display:none}
+.mole.bomb .bombart{display:block}
+.dizzy{display:none;position:absolute;left:14%;top:9%;width:72%;aspect-ratio:1;border-radius:50%;background:#e23b2e66;place-items:center;font:800 clamp(14px,3vw,22px) "Baloo 2",sans-serif;color:#fff;-webkit-text-stroke:1px #22140f}
+.mole.hit .dizzy{display:grid}
+.mole.hit .face{filter:saturate(.3) brightness(1.1);transform:scale(.92) rotate(-8deg)}
+.rim{position:absolute;left:4%;right:4%;bottom:4%;height:20%;border-radius:50%;background:radial-gradient(ellipse at 50% 0,transparent 55%,var(--grass2) 57%);pointer-events:none}
+.pop{position:absolute;pointer-events:none;font:800 clamp(20px,4vw,32px) "Baloo 2",sans-serif;color:#fff;-webkit-text-stroke:2px #22140f;paint-order:stroke;animation:pop .7s ease-out forwards;z-index:5;white-space:nowrap}
+.pop.bad{color:#ff5a4a}.pop.gold{color:var(--yel)}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.5)}25%{transform:translate(-50%,-80%) scale(1.15)}100%{transform:translate(-50%,-160%) scale(1);opacity:0}}
+.ov{position:absolute;inset:0;background:#22140fcc;border-radius:24px;display:grid;place-items:center;padding:14px;z-index:10}
+.ov[hidden]{display:none}
+.panel{background:var(--card);color:var(--ink);border:3px solid #22140f;border-radius:20px;padding:clamp(16px,3vw,26px);width:min(460px,100%);max-height:100%;overflow:auto}
+.panel h2{font-size:clamp(28px,5vw,40px);margin-bottom:6px}
+.panel p{margin:6px 0 12px}
+label{font-weight:700;display:block;margin:10px 0 6px}
+input[type=text]{width:100%;font:16px "Be Vietnam Pro",system-ui,sans-serif;padding:12px 14px;border:3px solid #22140f;border-radius:12px;background:#fff;color:#22140f}
+.btn{font:800 20px "Baloo 2",sans-serif;min-height:48px;padding:8px 22px;border:3px solid #22140f;border-radius:14px;background:var(--red);color:#fff;cursor:pointer;box-shadow:0 5px 0 #22140f;transition:transform .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #22140f}
+.btn.alt{background:var(--yel);color:#22140f}
+.btn.sm{font-size:16px;min-height:44px;padding:6px 14px}
+.btn:focus-visible,input:focus-visible{outline:3px solid #2a7cff;outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.thumbs div{position:relative}
+.thumbs img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid #22140f}
+.thumbs button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;border:2px solid #22140f;background:#fff;color:#22140f;font-weight:800;cursor:pointer;line-height:1;padding:0}
+.note{font-size:13px;opacity:.8}
+.count{font:800 clamp(90px,20vw,160px)/1 "Baloo 2",sans-serif;color:var(--yel);-webkit-text-stroke:4px #22140f;paint-order:stroke}
+.score-big{font:800 clamp(56px,12vw,88px)/1 "Baloo 2",sans-serif;color:var(--red)}
+.side{display:grid;gap:16px}
+.card{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:16px 18px}
+.card h3{font-size:26px;margin-bottom:8px}
+ol{margin:0;padding:0;list-style:none;counter-reset:r}
+ol li{counter-increment:r;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;padding:7px 0;border-bottom:2px dashed #22140f33;align-items:center}
+ol li::before{content:counter(r);font:800 18px "Baloo 2",sans-serif;width:26px;height:26px;border-radius:50%;background:var(--yel);color:#22140f;display:grid;place-items:center;border:2px solid #22140f}
+ol li:nth-child(1)::before{background:#ffb400}
+ol li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ol li b{font-variant-numeric:tabular-nums;white-space:nowrap}
+ol li.empty::before{display:none}
+ol li.me{background:#ffcf3a55;border-radius:8px}
+.legend{display:grid;gap:8px;font-size:15px}
+.legend div{display:flex;gap:10px;align-items:center}
+.legend i{width:30px;height:30px;border-radius:50%;border:3px solid #22140f;flex:none}
+.empty{opacity:.7;font-size:15px}
+.linkbtn{background:none;border:0;color:inherit;text-decoration:underline;font:13px "Be Vietnam Pro",system-ui,sans-serif;cursor:pointer;padding:8px 0;min-height:44px}
+@media(prefers-reduced-motion:reduce){.bulbs,.board.shake,.pop{animation:none}.mole{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <main class="cab" id="cab">
+    <div class="marq"><div class="bulbs"></div>
+      <div><h1>Đập Chuột!</h1><small>Event Club of BUV</small></div>
+      <div class="row" style="margin:0"><button class="btn sm" id="quitBtn" hidden>Bỏ cuộc</button><button class="btn alt sm" id="soundBtn" aria-pressed="true">Âm thanh: bật</button></div>
+    </div>
+    <div class="hud">
+      <div class="stat"><b id="sc">0</b><span>Điểm</span></div>
+      <div class="stat"><b id="cb">x1</b><span>Combo</span></div>
+      <div class="stat"><b id="tm">30</b><span>Giây</span></div>
+    </div>
+    <div class="tbar"><i id="tb"></i></div>
+    <div class="board" id="board"></div>
+
+    <div class="ov" id="ovStart">
+      <div class="panel">
+        <h2>Ai sẽ bị đập hôm nay?</h2>
+        <p>Chụp hoặc tải lên mặt bạn bè (hoặc trưởng ban), mặt đó sẽ thành chú chuột. Có 30 giây, đập càng nhiều càng tốt!</p>
+        <label for="nm">Tên người chơi</label>
+        <input type="text" id="nm" maxlength="20" placeholder="Ví dụ: Minh Anh" autocomplete="off">
+        <label for="file">Mặt cho chuột (tối đa 4 ảnh)</label>
+        <div class="row" style="margin-top:0">
+          <label class="btn alt sm" for="file" style="margin:0;display:inline-grid;place-items:center">Chụp / chọn ảnh</label>
+          <input type="file" id="file" accept="image/*" capture="user" multiple hidden>
+          <span class="note" id="faceNote">Chưa có ảnh: dùng mặt mặc định</span>
+        </div>
+        <div class="thumbs" id="thumbs"></div>
+        <p class="note">Chỉ dùng ảnh của người đã đồng ý. Ảnh chỉ nằm trên máy này và mất khi tải lại trang.</p>
+        <div class="row"><button class="btn" id="startBtn">Bắt đầu!</button></div>
+      </div>
+    </div>
+
+    <div class="ov" id="ovCount" hidden><div class="count" id="countN">3</div></div>
+
+    <div class="ov" id="ovEnd" hidden>
+      <div class="panel" style="text-align:center">
+        <p id="endName" style="font-weight:700;margin:0"></p>
+        <div class="score-big" id="endScore">0</div>
+        <h2 id="endTitle" style="font-size:30px">Búa thần EC</h2>
+        <p id="endStats"></p>
+        <p id="endRank" style="font-weight:700"></p>
+        <p class="note">Thích cảm giác "cháy" như này? Ghé hỏi các anh chị EC về sự kiện sắp tới nhé!</p>
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="againBtn">Chơi lại</button>
+          <button class="btn alt" id="nextBtn">Người tiếp theo</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="side">
+    <section class="card">
+      <h3>Bảng vàng</h3>
+      <ol id="lb"></ol>
+      <button class="linkbtn" id="clearBtn">Xoá bảng xếp hạng</button> · <a class="linkbtn" href="/" style="display:inline-block">Về trang chủ</a>
+    </section>
+    <section class="card">
+      <h3>Luật chơi</h3>
+      <div class="legend">
+        <div><i style="background:#9a6236"></i>Chuột thường: +10 điểm</div>
+        <div><i style="background:#ffd23f"></i>Chuột vương miện: +30 điểm</div>
+        <div><i style="background:#22140f"></i>Bom "Deadline": −30, mất combo</div>
+        <div><i style="background:#63b94b"></i>Đập trượt: mất combo</div>
+      </div>
+      <p class="note" style="margin-top:10px">Cứ 5 cú trúng liên tiếp combo tăng 1 bậc, tối đa x3.</p>
+    </section>
+  </aside>
+</div>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const DUR=30, KEY='ec-whack-lb';
+const DEF='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#ffd9b0"/><path d="M8 40 Q50 -10 92 40 Q80 18 50 16 Q20 18 8 40Z" fill="#3a2414"/><ellipse cx="34" cy="50" rx="6" ry="8" fill="#22140f"/><ellipse cx="66" cy="50" rx="6" ry="8" fill="#22140f"/><circle cx="36" cy="47" r="2" fill="#fff"/><circle cx="68" cy="47" r="2" fill="#fff"/><ellipse cx="24" cy="64" rx="8" ry="5" fill="#ff9a8a"/><ellipse cx="76" cy="64" rx="8" ry="5" fill="#ff9a8a"/><path d="M36 68 Q50 82 64 68" stroke="#22140f" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`);
+const BOMB=`<svg viewBox="0 0 100 100" width="100%" height="100%"><path d="M62 22 Q72 6 84 12" stroke="#a0622d" stroke-width="5" fill="none"/><circle cx="86" cy="11" r="6" fill="#ffcf3a"><animate attributeName="r" values="4;8;4" dur=".4s" repeatCount="indefinite"/></circle><rect x="48" y="18" width="20" height="14" rx="3" fill="#555" stroke="#22140f" stroke-width="3" transform="rotate(30 58 25)"/><circle cx="48" cy="60" r="36" fill="#2c2228" stroke="#22140f" stroke-width="4"/><circle cx="36" cy="46" r="8" fill="#fff3"/><text x="48" y="66" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="15" fill="#ffcf3a">DEADLINE</text></svg>`;
+const board=$('#board');
+board.innerHTML=Array.from({length:9},(_,i)=>`<div class="hole" data-i="${i}"><div class="pit"><div class="mole"><span class="ear l"></span><span class="ear r"></span><div class="body"></div><img class="face" alt="" draggable="false"><span class="paw l"></span><span class="paw r"></span><span class="crown"></span><div class="dizzy">BỐP!</div><div class="bombart">${BOMB}</div></div></div><div class="rim"></div></div>`).join('');
+const holes=[...board.querySelectorAll('.hole')].map(h=>({el:h,m:h.querySelector('.mole'),img:h.querySelector('.face'),up:false,type:'',tid:0}));
+let iv=0,faces=[],state='idle',score=0,combo=0,streak=0,hits=0,swings=0,t0=0,tick=0,spawnT=0,sound=true,ac=null,lastName='';
+let lb=[];try{lb=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){lb=[]}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(lb))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function beep(f,d=.09,type='square',v=.12){if(!sound)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(Math.max(40,f/2.5),t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d)}catch(e){}}
+
+function renderLb(hl){const L=$('#lb');L.innerHTML=lb.length?lb.map((r,i)=>`<li class="${i===hl?'me':''}"><span>${esc(r.n)}</span><b>${r.s}</b></li>`).join(''):'<li class="empty" style="display:block">Chưa có ai. Bạn là người đầu tiên!</li>'}
+renderLb(-1);
+
+function renderThumbs(){$('#thumbs').innerHTML=faces.map((f,i)=>`<div><img src="${f}" alt="Mặt ${i+1}"><button data-k="${i}" aria-label="Bỏ ảnh ${i+1}">×</button></div>`).join('');$('#faceNote').textContent=faces.length?`${faces.length} ảnh đã sẵn sàng`:'Chưa có ảnh: dùng mặt mặc định'}
+$('#thumbs').addEventListener('click',e=>{const k=e.target.dataset.k;if(k!==undefined){faces.splice(+k,1);renderThumbs()}});
+$('#file').addEventListener('change',e=>{[...e.target.files].slice(0,4-faces.length).forEach(file=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),S=256;c.width=c.height=S;const s=Math.min(im.width,im.height),ctx=c.getContext('2d');ctx.drawImage(im,(im.width-s)/2,(im.height-s)/2*0.7,s,s,0,0,S,S);if(faces.length<4)faces.push(c.toDataURL('image/jpeg',.85));renderThumbs()};im.src=r.result};r.readAsDataURL(file)});e.target.value=''});
+
+function setHud(){$('#sc').textContent=score;$('#cb').textContent='x'+combo}
+function popText(x,y,txt,cls){const p=document.createElement('div');p.className='pop '+(cls||'');p.textContent=txt;p.style.left=x+'px';p.style.top=y+'px';board.appendChild(p);setTimeout(()=>p.remove(),700)}
+
+function hide(h){h.up=false;h.m.classList.remove('up');h.m.classList.add('down');clearTimeout(h.tid)}
+function spawn(){
+  if(state!=='play')return;
+  const p=Math.min(1,(performance.now()-t0)/(DUR*1000));
+  const free=holes.filter(h=>!h.up);
+  const n=p>.55&&Math.random()<.35?2:1;
+  for(let k=0;k<n&&free.length;k++){
+    const h=free.splice(Math.random()*free.length|0,1)[0];
+    const r=Math.random();h.type=r<.14?'bomb':r<.25?'gold':'norm';
+    h.m.className='mole';if(h.type!=='norm')h.m.classList.add(h.type);
+    h.img.src=faces.length?faces[Math.random()*faces.length|0]:DEF;
+    void h.m.offsetWidth;h.m.classList.add('up');h.up=true;
+    const upT=(1150-560*p)*(h.type==='gold'?.75:1);
+    h.tid=setTimeout(()=>{hide(h);if(h.type!=='bomb'){streak=0;combo=1;setHud()}},upT);
+  }
+  spawnT=setTimeout(spawn,(820-420*p)*(.7+Math.random()*.6));
+}
+board.addEventListener('pointerdown',e=>{
+  if(state!=='play')return;
+  const he=e.target.closest('.hole');if(!he)return;
+  const h=holes[+he.dataset.i],br=board.getBoundingClientRect(),x=e.clientX-br.left,y=e.clientY-br.top;
+  swings++;
+  if(h.up&&!h.m.classList.contains('hit')){
+    clearTimeout(h.tid);
+    if(h.type==='bomb'){score=Math.max(0,score-30);combo=1;streak=0;board.classList.remove('shake');void board.offsetWidth;board.classList.add('shake');popText(x,y,'BÙM! −30','bad');beep(90,.35,'sawtooth',.2);hide(h)}
+    else{hits++;streak++;combo=Math.min(3,1+Math.floor(streak/5));const pts=(h.type==='gold'?30:10)*combo;score+=pts;h.m.classList.add('hit');popText(x,y,(h.type==='gold'?'ĐỈNH! +':'+')+pts,h.type==='gold'?'gold':'');beep(h.type==='gold'?880:520,.1);setTimeout(()=>hide(h),220)}
+  }else{streak=0;combo=1;beep(160,.06,'triangle',.08)}
+  setHud();
+});
+
+function startCountdown(){
+  lastName=$('#nm').value.trim()||'Người chơi bí ẩn';
+  $('#ovStart').hidden=true;$('#ovEnd').hidden=true;$('#ovCount').hidden=false;
+  score=0;combo=1;streak=0;hits=0;swings=0;setHud();$('#tm').textContent=DUR;$('#tb').style.width='100%';
+  let n=3;$('#countN').textContent=n;beep(440,.12);state='count';$('#quitBtn').hidden=false;
+  clearInterval(iv);iv=setInterval(()=>{n--;if(n>0){$('#countN').textContent=n;beep(440,.12)}else{clearInterval(iv);$('#ovCount').hidden=true;beep(880,.2);play()}},700);
+}
+function play(){state='play';t0=performance.now();spawn();tick=setInterval(()=>{const left=Math.max(0,DUR-(performance.now()-t0)/1000);$('#tm').textContent=Math.ceil(left);$('#tb').style.width=(left/DUR*100)+'%';if(left<=0)end()},100)}
+function stopAll(){state='idle';clearInterval(iv);clearInterval(tick);clearTimeout(spawnT);holes.forEach(hide);$('#quitBtn').hidden=true}
+function quit(){if(state==='idle')return;stopAll();score=0;combo=1;setHud();$('#tm').textContent=DUR;$('#tb').style.width='100%';$('#ovCount').hidden=true;$('#ovEnd').hidden=true;$('#ovStart').hidden=false}
+function end(){
+  stopAll();
+  beep(660,.15);setTimeout(()=>beep(990,.3),150);
+  const acc=swings?Math.round(hits/swings*100):0;
+  const title=score<150?'Tân binh nhanh tay':score<300?'Thợ đập chính hiệu':score<500?'Búa thần EC':'Huyền thoại booth';
+  const rec={n:lastName,s:score};lb.push(rec);lb.sort((a,b)=>b.s-a.s);const pos=lb.indexOf(rec);lb=lb.slice(0,10);save();
+  renderLb(pos<10?pos:-1);
+  $('#endName').textContent=lastName;$('#endScore').textContent=score;$('#endTitle').textContent=title;
+  $('#endStats').textContent=`${hits} cú trúng · độ chính xác ${acc}%`;
+  $('#endRank').textContent=pos===0?'Kỷ lục mới của booth!':pos<10?`Bạn đang đứng hạng ${pos+1} trên bảng vàng`:'Chưa vào top 10, thử lại nhé!';
+  $('#ovEnd').hidden=false;
+}
+$('#startBtn').addEventListener('click',startCountdown);
+$('#quitBtn').addEventListener('click',quit);
+$('#nm').addEventListener('keydown',e=>{if(e.key==='Enter')startCountdown()});
+$('#againBtn').addEventListener('click',startCountdown);
+$('#nextBtn').addEventListener('click',()=>{faces=[];renderThumbs();$('#nm').value='';$('#ovEnd').hidden=true;$('#ovStart').hidden=false;$('#nm').focus()});
+$('#soundBtn').addEventListener('click',e=>{sound=!sound;e.target.textContent='Âm thanh: '+(sound?'bật':'tắt');e.target.setAttribute('aria-pressed',sound)});
+let armed=0;$('#clearBtn').addEventListener('click',e=>{if(armed){lb=[];save();renderLb(-1);e.target.textContent='Xoá bảng xếp hạng';armed=0}else{armed=1;e.target.textContent='Bấm lần nữa để xoá hẳn';setTimeout(()=>{armed=0;e.target.textContent='Xoá bảng xếp hạng'},3000)}});
+}
+</script>
+</body>
+</html>
